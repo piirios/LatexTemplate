@@ -1,0 +1,119 @@
+
+
+
+\documentclass[12pt]{article}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{pgffor}
+\usepackage{xfp}
+\usepackage{etoolbox}
+
+% Company Information Variables
+\newcommand{\companyname}{Company Name}
+\newcommand{\companyaddress}{Address}
+\newcommand{\companycity}{Street}
+\newcommand{\companystate}{State}
+\newcommand{\companyzip}{Zip}
+\newcommand{\companyemail}{email@company.com}
+\newcommand{\companyphone}{000-000-0000}
+\newcommand{\companylogo}{logo.png}
+\newcommand{\companyfooter}{Thank you for your business!}
+
+% Client ID
+\newcommand{\invoiceto}{Contracted}
+\newcommand{\invoicedate}{11/30/2024}
+\newcommand{\invoiceid}{003}
+
+\makeatletter
+% Initialize project list
+\def\projectlist{}
+\def\grandtotal{0}
+\newcommand{\addprojecttolist}[1]{%
+    \xifinlist{#1}{\projectlist}{}{%
+        \listgadd{\projectlist}{#1}%
+    }%
+}
+% Define work item
+\newcommand{\definework}[4]{%
+    \addprojecttolist{#1}%
+    \@ifundefined{proj:#1}{%
+        \expandafter\def\csname proj:#1\endcsname{}%
+        \expandafter\def\csname projtotal:#1\endcsname{0}%
+    }{}%
+    \expandafter\g@addto@macro\csname proj:#1\endcsname{%
+        #2 & #3 & #4 & \fpeval{#3 * #4} \\
+    }%
+    \expandafter\xdef\csname projtotal:#1\endcsname{\fpeval{\csname projtotal:#1\endcsname + (#3 * #4)}}%
+    \xdef\grandtotal{\fpeval{\grandtotal + (#3 * #4)}}%
+}
+% Define expense item
+\newcommand{\defineexpense}[3]{%
+    \addprojecttolist{#1}%
+    \@ifundefined{proj:#1}{%
+        \expandafter\def\csname proj:#1\endcsname{}%
+        \expandafter\def\csname projtotal:#1\endcsname{0}%
+    }{}%
+    \expandafter\g@addto@macro\csname proj:#1\endcsname{%
+        #2 & {---} & {---} & #3 \\
+    }%
+    \expandafter\xdef\csname projtotal:#1\endcsname{\fpeval{\csname projtotal:#1\endcsname + #3}}%
+    \xdef\grandtotal{\fpeval{\grandtotal + #3}}%
+}
+\makeatother  % Reset @ handling
+
+% Display a single project
+\newcommand{\displayproject}[1]{%
+    \noindent\newline\textbf{Project Name:} #1\par\vspace{0.3cm}
+    \noindent
+    \begin{tabular}{|p{7.5cm}|p{2cm}|p{2cm}|p{2.5cm}|}
+        \hline
+        \textbf{Description} & \textbf{Hours} & \textbf{Rate (\$)} & \textbf{Amount (\$)} \\
+        \hline
+        \csname proj:#1\endcsname
+        \hline
+        \multicolumn{3}{|l|}{\textbf{Total}} & \csname projtotal:#1\endcsname \\ \hline
+    \end{tabular}
+    \vspace{1cm}
+}
+
+% Define the list processor
+\newcommand{\processprojects}[1]{%
+    \displayproject{#1}%
+}
+
+\begin{document}
+
+% Define projects
+\definework{Contract Work}{Hourly Contract Work}{50}{40}
+\defineexpense{Contract Work}{Individual Expense}{50}
+
+% Logo and header
+\begin{center}
+    \includegraphics[width=2.5cm]{\companylogo}
+    
+    {\Large\bfseries \companyname}\\
+    {\companyaddress, \companycity, \companystate, \companyzip}\\
+    Email: \companyemail \hspace{1cm} Phone: \companyphone
+\end{center}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% Invoice Info
+\noindent{\textbf{Invoice To:}} \invoiceto\\
+\noindent{\textbf{Invoice Number:}} \#\invoiceid\\
+{\textbf{Invoice Date:}} \invoicedate\\
+
+% Display projects
+\forlistloop{\processprojects}{\projectlist}
+
+\noindent{\textbf{Grand Total:}} \$\fpeval{\grandtotal}
+
+% Footer
+\begin{center}
+    {\textit{\companyname\ — \companyfooter}}
+\end{center}
+
+\end{document}
