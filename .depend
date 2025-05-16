@@ -1,0 +1,22 @@
+core.cmo : \
+    textemplatecoreparser.cmi \
+    textemplatecorelexer.cmo \
+    textemplatecoreast.cmo
+core.cmx : \
+    textemplatecoreparser.cmx \
+    textemplatecorelexer.cmx \
+    textemplatecoreast.cmx
+textemplatecoreast.cmo :
+textemplatecoreast.cmx :
+textemplatecorelexer.cmo : \
+    textemplatecoreparser.cmi
+textemplatecorelexer.cmx : \
+    textemplatecoreparser.cmx
+textemplatecoreparser.cmo : \
+    textemplatecoreast.cmo \
+    textemplatecoreparser.cmi
+textemplatecoreparser.cmx : \
+    textemplatecoreast.cmx \
+    textemplatecoreparser.cmi
+textemplatecoreparser.cmi : \
+    textemplatecoreast.cmo

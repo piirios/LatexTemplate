@@ -1,0 +1,18 @@
+fn special_print(wow) {
+    print("special print:")
+    print(wow)
+    print("EOF special print\n")
+}
+
+let mut val1 = params1;
+let val2 = params1 + params2;
+val1 = val1 + val2;
+for i in 1..25 {
+    print(i)
+}
+loop {
+    val1 = val1 + 1;
+    special_print(val1)
+    break;
+}
+return ()
