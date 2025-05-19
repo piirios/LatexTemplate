@@ -36,6 +36,7 @@ type fun_def = {
 
 type top_level = 
   | Instruction of instr
+  | Expression of expr
   | Function of fun_def
 
 type componant = {
@@ -65,3 +66,19 @@ and print_expr_opt oc = function
 let rec print_expr_lst oc = function 
 | [] -> Printf.fprintf oc "\n"
 | hd::tl -> print_expr oc hd;Printf.fprintf oc "\n"; print_expr_lst oc tl
+
+
+let print_toplevel oc = function 
+| Instruction(ist) -> assert false;
+| Expression(expr) ->  print_expr oc expr
+| Function(func) ->  assert false;
+;;
+
+let rec print_toplevel_lst oc = function 
+| [] -> Printf.fprintf oc "\n"
+| hd::tl -> print_toplevel oc hd;Printf.fprintf oc "\n"; print_toplevel_lst oc tl
+;;
+
+let print_componant oc comp = 
+  print_toplevel_lst oc comp.core
+;;

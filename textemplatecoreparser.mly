@@ -32,15 +32,22 @@
 %token IF ELSE ELSIF
 %token TRUE FALSE
 
-%start expr_prg
-%type <Textemplatecoreast.expr list> expr_prg
+%start componant
+%type <Textemplatecoreast.componant> componant
 
 %%
 
+componant:
+| toplevel_lst { {core= $1} }
+;
 
-expr_prg:
+toplevel_lst:
 | EOF { [] }
-| expr expr_prg { $1 :: $2 }
+| toplevel toplevel_lst { $1 :: $2 }
+;
+
+toplevel:
+| expr { Expression $1 }
 ;
 
 expr:

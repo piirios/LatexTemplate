@@ -25,9 +25,9 @@ let main() =
   in
   let _ = Printf.printf "        Welcome to PCF, version %s\n%!" version in
   let lexbuf = Lexing.from_channel input_channel in
-  let e = Textemplatecoreparser.expr_prg Textemplatecorelexer.lex lexbuf in
+  let prog = Textemplatecoreparser.componant Textemplatecorelexer.lex lexbuf in
   let _ = Printf.printf "Recognized: " in
-  Textemplatecoreast.print_expr_lst stdout e;;
+  Textemplatecoreast.print_componant stdout prog;;
 (*   while true do
     try
       let _ = Printf.printf  "> %!" in
