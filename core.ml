@@ -25,12 +25,15 @@ let main() =
   in
   let _ = Printf.printf "        Welcome to PCF, version %s\n%!" version in
   let lexbuf = Lexing.from_channel input_channel in
-  while true do
+  let e = Textemplatecoreparser.expr_prg Textemplatecorelexer.lex lexbuf in
+  let _ = Printf.printf "Recognized: " in
+  Textemplatecoreast.print_expr_lst stdout e;;
+(*   while true do
     try
       let _ = Printf.printf  "> %!" in
-      let e = Textemplatecoreparser.expr Textemplatecorelexer.lex lexbuf in
+      let e = Textemplatecoreparser.expr_prg Textemplatecorelexer.lex lexbuf in
       let _ = Printf.printf "Recognized: " in
-      let _ = Textemplatecoreast.print_expr stdout e in
+      let _ = Textemplatecoreast.print_expr_lst stdout e in
 (*    let _ = Printf.fprintf stdout " =\n%!" in
       let _ = Pcfsem.printval (Pcfsem.eval e) in *)
       Printf.printf "\n%!"
@@ -46,14 +49,13 @@ let main() =
           sp.Lexing.pos_lnum
           (sp.Lexing.pos_cnum - sp.Lexing.pos_bol)
           (ep.Lexing.pos_cnum - sp.Lexing.pos_bol)
-    | Textemplatecorelexer.LexError (sp, ep) ->
+(*     | Textemplatecorelexer.LexError (sp, ep) ->
         Printf.printf
           "File %S, line %i, characters %i-%i: Lexical error.\n"
           sp.Lexing.pos_fname
           sp.Lexing.pos_lnum
           (sp.Lexing.pos_cnum - sp.Lexing.pos_bol)
-          (ep.Lexing.pos_cnum - sp.Lexing.pos_bol)
-  done
-;;
+          (ep.Lexing.pos_cnum - sp.Lexing.pos_bol) *)
+  done *)
 
 if !Sys.interactive then () else main();;

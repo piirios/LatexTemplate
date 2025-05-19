@@ -51,5 +51,5 @@ type token =
   | ELSE
   | ELSIF
 
-val expr :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Textemplatecoreast.expr
+val expr_prg :
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Textemplatecoreast.expr list

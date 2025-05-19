@@ -32,11 +32,16 @@
 %token IF ELSE ELSIF
 %token TRUE FALSE
 
-%start expr
-%type <Textemplatecoreast.expr> expr
+%start expr_prg
+%type <Textemplatecoreast.expr list> expr_prg
 
 %%
 
+
+expr_prg:
+| EOF { [] }
+| expr expr_prg { $1 :: $2 }
+;
 
 expr:
 | IDENT LPAREN opt_exprs RPAREN      { App ($1, $3) }
