@@ -1,0 +1,30 @@
+// Test des opérations arithmétiques
+2 + 3 * 4
+(2 + 3) * 4
+10 / 2 - 3
+-5 * 2
+
+// Test des comparaisons
+5 > 3
+10 <= 10
+2 + 3 == 5
+4 * 2 >= 8
+
+// Test des appels de fonctions
+maFonction(1, 2, 3)
+calculer(5 + 3, 2 * 4)
+
+// Test des tableaux
+monTableau[0]
+monTableau[1 + 2]
+
+// Test des types de base
+42
+true
+false
+"Hello World"
+()
+
+// Test des expressions complexes
+maFonction(monTableau[0], 2 + 3 * 4, "test")
+(5 > 3) == true 

@@ -64,4 +64,4 @@ and print_expr_opt oc = function
 
 let rec print_expr_lst oc = function 
 | [] -> Printf.fprintf oc "\n"
-| hd::tl -> print_expr oc hd; print_expr_lst oc tl
+| hd::tl -> print_expr oc hd;Printf.fprintf oc "\n"; print_expr_lst oc tl
