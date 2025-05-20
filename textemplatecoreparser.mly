@@ -66,7 +66,7 @@ var_decl_content:
 
 instrs:
 | instr { [$1] }
-| instr SEMICOLON instrs { $1 :: $3 }
+| instr instrs { $1 :: $2 }
 ;
 
 instr_scope:
