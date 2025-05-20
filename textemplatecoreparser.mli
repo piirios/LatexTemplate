@@ -54,6 +54,7 @@ type token =
   | ELSE
   | ELSIF
   | BREAK
+  | FN
 
 val componant :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Textemplatecoreast.componant

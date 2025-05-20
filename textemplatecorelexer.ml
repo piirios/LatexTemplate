@@ -298,140 +298,141 @@ let
         | "true" -> TRUE
         | "false" -> FALSE
         | "break" -> BREAK
+        | "fn" -> FN
         | _ -> IDENT(lxm) )
-# 303 "textemplatecorelexer.ml"
+# 304 "textemplatecorelexer.ml"
 
   | 4 ->
-# 102 "textemplatecorelexer.mll"
+# 103 "textemplatecorelexer.mll"
           ( COLONEQUAL )
-# 308 "textemplatecorelexer.ml"
+# 309 "textemplatecorelexer.ml"
 
   | 5 ->
-# 103 "textemplatecorelexer.mll"
+# 104 "textemplatecorelexer.mll"
            ( EQUALEQUAL )
-# 313 "textemplatecorelexer.ml"
+# 314 "textemplatecorelexer.ml"
 
   | 6 ->
-# 104 "textemplatecorelexer.mll"
+# 105 "textemplatecorelexer.mll"
           ( GREATER)
-# 318 "textemplatecorelexer.ml"
+# 319 "textemplatecorelexer.ml"
 
   | 7 ->
-# 104 "textemplatecorelexer.mll"
+# 105 "textemplatecorelexer.mll"
                             ( SMALLER )
-# 323 "textemplatecorelexer.ml"
+# 324 "textemplatecorelexer.ml"
 
   | 8 ->
-# 105 "textemplatecorelexer.mll"
+# 106 "textemplatecorelexer.mll"
           ( GREATEREQUAL)
-# 328 "textemplatecorelexer.ml"
+# 329 "textemplatecorelexer.ml"
 
   | 9 ->
-# 105 "textemplatecorelexer.mll"
+# 106 "textemplatecorelexer.mll"
                                   ( SMALLEREQUAL )
-# 333 "textemplatecorelexer.ml"
+# 334 "textemplatecorelexer.ml"
 
   | 10 ->
-# 106 "textemplatecorelexer.mll"
+# 107 "textemplatecorelexer.mll"
           ( PLUS )
-# 338 "textemplatecorelexer.ml"
+# 339 "textemplatecorelexer.ml"
 
   | 11 ->
-# 106 "textemplatecorelexer.mll"
+# 107 "textemplatecorelexer.mll"
                            ( MINUS )
-# 343 "textemplatecorelexer.ml"
+# 344 "textemplatecorelexer.ml"
 
   | 12 ->
-# 106 "textemplatecorelexer.mll"
+# 107 "textemplatecorelexer.mll"
                                            ( MULT )
-# 348 "textemplatecorelexer.ml"
+# 349 "textemplatecorelexer.ml"
 
   | 13 ->
-# 106 "textemplatecorelexer.mll"
+# 107 "textemplatecorelexer.mll"
                                                           ( DIV )
-# 353 "textemplatecorelexer.ml"
+# 354 "textemplatecorelexer.ml"
 
   | 14 ->
-# 107 "textemplatecorelexer.mll"
+# 108 "textemplatecorelexer.mll"
           ( SEMICOLON )
-# 358 "textemplatecorelexer.ml"
+# 359 "textemplatecorelexer.ml"
 
   | 15 ->
-# 108 "textemplatecorelexer.mll"
+# 109 "textemplatecorelexer.mll"
           ( COMMA )
-# 363 "textemplatecorelexer.ml"
+# 364 "textemplatecorelexer.ml"
 
   | 16 ->
-# 109 "textemplatecorelexer.mll"
+# 110 "textemplatecorelexer.mll"
           ( DOUBLEDOT )
-# 368 "textemplatecorelexer.ml"
+# 369 "textemplatecorelexer.ml"
 
   | 17 ->
-# 110 "textemplatecorelexer.mll"
+# 111 "textemplatecorelexer.mll"
            ( UNIT )
-# 373 "textemplatecorelexer.ml"
+# 374 "textemplatecorelexer.ml"
 
   | 18 ->
-# 111 "textemplatecorelexer.mll"
+# 112 "textemplatecorelexer.mll"
           ( LPAREN )
-# 378 "textemplatecorelexer.ml"
+# 379 "textemplatecorelexer.ml"
 
   | 19 ->
-# 112 "textemplatecorelexer.mll"
+# 113 "textemplatecorelexer.mll"
           ( RPAREN )
-# 383 "textemplatecorelexer.ml"
+# 384 "textemplatecorelexer.ml"
 
   | 20 ->
-# 113 "textemplatecorelexer.mll"
+# 114 "textemplatecorelexer.mll"
           ( LSIMPLEBRACE )
-# 388 "textemplatecorelexer.ml"
+# 389 "textemplatecorelexer.ml"
 
   | 21 ->
-# 114 "textemplatecorelexer.mll"
+# 115 "textemplatecorelexer.mll"
           ( RSIMPLEBRACE )
-# 393 "textemplatecorelexer.ml"
+# 394 "textemplatecorelexer.ml"
 
   | 22 ->
-# 115 "textemplatecorelexer.mll"
+# 116 "textemplatecorelexer.mll"
           ( LBRACKET )
-# 398 "textemplatecorelexer.ml"
+# 399 "textemplatecorelexer.ml"
 
   | 23 ->
-# 116 "textemplatecorelexer.mll"
+# 117 "textemplatecorelexer.mll"
           ( RBRACKET )
-# 403 "textemplatecorelexer.ml"
+# 404 "textemplatecorelexer.ml"
 
   | 24 ->
-# 117 "textemplatecorelexer.mll"
+# 118 "textemplatecorelexer.mll"
           ( reset_string_buffer();
             in_string lexbuf;
             STRING (get_stored_string()) )
-# 410 "textemplatecorelexer.ml"
+# 411 "textemplatecorelexer.ml"
 
   | 25 ->
-# 120 "textemplatecorelexer.mll"
+# 121 "textemplatecorelexer.mll"
           ( in_cpp_comment lexbuf )
-# 415 "textemplatecorelexer.ml"
+# 416 "textemplatecorelexer.ml"
 
   | 26 ->
-# 121 "textemplatecorelexer.mll"
+# 122 "textemplatecorelexer.mll"
           ( in_c_comment lexbuf )
-# 420 "textemplatecorelexer.ml"
+# 421 "textemplatecorelexer.ml"
 
   | 27 ->
-# 122 "textemplatecorelexer.mll"
+# 123 "textemplatecorelexer.mll"
           ( EOF )
-# 425 "textemplatecorelexer.ml"
+# 426 "textemplatecorelexer.ml"
 
   | 28 ->
 let
-# 123 "textemplatecorelexer.mll"
+# 124 "textemplatecorelexer.mll"
           c
-# 431 "textemplatecorelexer.ml"
+# 432 "textemplatecorelexer.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 123 "textemplatecorelexer.mll"
+# 124 "textemplatecorelexer.mll"
             ( Printf.eprintf "Invalid char `%c'\n%!" c ; lex lexbuf )
-# 435 "textemplatecorelexer.ml"
+# 436 "textemplatecorelexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_lex_rec lexbuf __ocaml_lex_state
@@ -441,66 +442,66 @@ and in_string lexbuf =
 and __ocaml_lex_in_string_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 127 "textemplatecorelexer.mll"
+# 128 "textemplatecorelexer.mll"
       ( () )
-# 447 "textemplatecorelexer.ml"
+# 448 "textemplatecorelexer.ml"
 
   | 1 ->
-# 129 "textemplatecorelexer.mll"
+# 130 "textemplatecorelexer.mll"
       ( store_string_char(char_for_backslash(Lexing.lexeme_char lexbuf 1));
         in_string lexbuf )
-# 453 "textemplatecorelexer.ml"
+# 454 "textemplatecorelexer.ml"
 
   | 2 ->
-# 132 "textemplatecorelexer.mll"
+# 133 "textemplatecorelexer.mll"
       ( store_string_char(char_for_decimal_code lexbuf 1);
         in_string lexbuf )
-# 459 "textemplatecorelexer.ml"
+# 460 "textemplatecorelexer.ml"
 
   | 3 ->
-# 135 "textemplatecorelexer.mll"
+# 136 "textemplatecorelexer.mll"
       ( store_string_char(char_for_hexadecimal_code lexbuf 2);
          in_string lexbuf )
-# 465 "textemplatecorelexer.ml"
+# 466 "textemplatecorelexer.ml"
 
   | 4 ->
 let
-# 137 "textemplatecorelexer.mll"
-              chars
-# 471 "textemplatecorelexer.ml"
-= Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos (lexbuf.Lexing.lex_start_pos + 2) in
 # 138 "textemplatecorelexer.mll"
+              chars
+# 472 "textemplatecorelexer.ml"
+= Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos (lexbuf.Lexing.lex_start_pos + 2) in
+# 139 "textemplatecorelexer.mll"
       ( skip_to_eol lexbuf; raise (Failure("Illegal escape: " ^ chars)) )
-# 475 "textemplatecorelexer.ml"
+# 476 "textemplatecorelexer.ml"
 
   | 5 ->
 let
-# 139 "textemplatecorelexer.mll"
-               s
-# 481 "textemplatecorelexer.ml"
-= Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 140 "textemplatecorelexer.mll"
+               s
+# 482 "textemplatecorelexer.ml"
+= Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
+# 141 "textemplatecorelexer.mll"
       ( for i = 0 to String.length s - 1 do
           store_string_char s.[i];
         done;
         in_string lexbuf
       )
-# 489 "textemplatecorelexer.ml"
+# 490 "textemplatecorelexer.ml"
 
   | 6 ->
-# 146 "textemplatecorelexer.mll"
+# 147 "textemplatecorelexer.mll"
       ( raise Eoi )
-# 494 "textemplatecorelexer.ml"
+# 495 "textemplatecorelexer.ml"
 
   | 7 ->
 let
-# 147 "textemplatecorelexer.mll"
-         c
-# 500 "textemplatecorelexer.ml"
-= Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
 # 148 "textemplatecorelexer.mll"
+         c
+# 501 "textemplatecorelexer.ml"
+= Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
+# 149 "textemplatecorelexer.mll"
       ( store_string_char c; in_string lexbuf )
-# 504 "textemplatecorelexer.ml"
+# 505 "textemplatecorelexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_in_string_rec lexbuf __ocaml_lex_state
@@ -510,19 +511,19 @@ and in_cpp_comment lexbuf =
 and __ocaml_lex_in_cpp_comment_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 151 "textemplatecorelexer.mll"
+# 152 "textemplatecorelexer.mll"
          ( lex lexbuf )
-# 516 "textemplatecorelexer.ml"
+# 517 "textemplatecorelexer.ml"
 
   | 1 ->
-# 152 "textemplatecorelexer.mll"
+# 153 "textemplatecorelexer.mll"
          ( in_cpp_comment lexbuf )
-# 521 "textemplatecorelexer.ml"
+# 522 "textemplatecorelexer.ml"
 
   | 2 ->
-# 153 "textemplatecorelexer.mll"
+# 154 "textemplatecorelexer.mll"
          ( raise Eoi )
-# 526 "textemplatecorelexer.ml"
+# 527 "textemplatecorelexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_in_cpp_comment_rec lexbuf __ocaml_lex_state
@@ -532,19 +533,19 @@ and in_c_comment lexbuf =
 and __ocaml_lex_in_c_comment_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 156 "textemplatecorelexer.mll"
+# 157 "textemplatecorelexer.mll"
          ( lex lexbuf )
-# 538 "textemplatecorelexer.ml"
+# 539 "textemplatecorelexer.ml"
 
   | 1 ->
-# 157 "textemplatecorelexer.mll"
+# 158 "textemplatecorelexer.mll"
          ( in_c_comment lexbuf )
-# 543 "textemplatecorelexer.ml"
+# 544 "textemplatecorelexer.ml"
 
   | 2 ->
-# 158 "textemplatecorelexer.mll"
+# 159 "textemplatecorelexer.mll"
          ( raise Eoi )
-# 548 "textemplatecorelexer.ml"
+# 549 "textemplatecorelexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_in_c_comment_rec lexbuf __ocaml_lex_state
@@ -554,14 +555,14 @@ and skip_to_eol lexbuf =
 and __ocaml_lex_skip_to_eol_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 161 "textemplatecorelexer.mll"
+# 162 "textemplatecorelexer.mll"
             ( () )
-# 560 "textemplatecorelexer.ml"
+# 561 "textemplatecorelexer.ml"
 
   | 1 ->
-# 162 "textemplatecorelexer.mll"
+# 163 "textemplatecorelexer.mll"
             ( skip_to_eol lexbuf )
-# 565 "textemplatecorelexer.ml"
+# 566 "textemplatecorelexer.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_skip_to_eol_rec lexbuf __ocaml_lex_state

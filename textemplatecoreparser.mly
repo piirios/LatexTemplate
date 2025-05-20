@@ -32,6 +32,7 @@
 %token IF ELSE ELSIF
 %token TRUE FALSE
 %token BREAK
+%token FN
 
 %start componant
 %type <Textemplatecoreast.componant> componant
@@ -51,6 +52,24 @@ toplevel_lst:
 toplevel:
 | expr SEMICOLON { Expression $1 }
 | instr { Instruction $1 }
+| fun_def { Function $1 }
+;
+
+//function
+
+fun_def:
+| FN IDENT LPAREN opt_params RPAREN instr_scope
+    { { f_name = $2 ; params = $4 ; body = $6 } }
+;
+
+opt_params:
+| { [] }
+| IDENT params { $1 :: $2 }
+;
+
+params:
+| { [] }
+| COMMA IDENT params { $2 :: $3 }
 ;
 
 //variable decl

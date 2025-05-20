@@ -127,7 +127,11 @@ and print_inst_list oc = function
 let print_toplevel oc = function 
 | Instruction(inst) -> print_inst oc inst;
 | Expression(expr) ->  print_expr oc expr
-| Function(func) ->  assert false;
+| Function(func) ->  
+    Printf.fprintf oc "function %s(%s) {\n%a}\n" 
+      func.f_name 
+      (String.concat ", " func.params)
+      print_inst_list func.body
 ;;
 
 let rec print_toplevel_lst oc = function 

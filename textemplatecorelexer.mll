@@ -98,6 +98,7 @@ rule lex = parse
         | "true" -> TRUE
         | "false" -> FALSE
         | "break" -> BREAK
+        | "fn" -> FN
         | _ -> IDENT(lxm) }
   | "="   { COLONEQUAL }
   | "=="   { EQUALEQUAL }
