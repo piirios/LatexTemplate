@@ -1,18 +1,21 @@
-fn special_print(wow) {
-    print("special print:")
-    print(wow)
-    print("EOF special print\n")
-}
+Componant1(params1, params2, params3) {
+    let mut val1 = params1;
+    let val2 = params1 + params2;
+    val1 = val1 + val2;
+    return {{
+        \begin{tabularx}{\linewidth}{@{}>{\bfseries\color{IPGPblue}}l@{\hspace*{2cm}}l@{}}
+        %\toprule
+        {% for val in params3%} {{
+            {% if val.amount >= 10 %} {{
+                %Catégorie  & A \\ \midrule
+            }} {% else %} {{
+                %Catégorie  & A \\ \midrule
+            }}
+        }}
+        \end{tabularx}
+    }}
+} where {
+    val1 >= 0;
+    val1 <= 100;
 
-let mut val1 = params1;
-let val2 = params1 + params2;
-val1 = val1 + val2;
-for i in 1..25 {
-    print(i)
 }
-loop {
-    val1 = val1 + 1;
-    special_print(val1)
-    break;
-}
-return ()

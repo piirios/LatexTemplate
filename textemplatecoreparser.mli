@@ -22,6 +22,7 @@ type token =
 )
   | TRUE
   | FALSE
+  | COLONEQUAL
   | UNIT
   | PLUS
   | MINUS
@@ -43,13 +44,16 @@ type token =
   | DOUBLEDOT
   | RETURN
   | LET
+  | MUT
   | PRINT
   | FOR
   | WHILE
   | LOOP
+  | IN
   | IF
   | ELSE
   | ELSIF
+  | BREAK
 
 val componant :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Textemplatecoreast.componant

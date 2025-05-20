@@ -23,11 +23,31 @@ let main() =
         end
     | n -> usage()
   in
-  let _ = Printf.printf "        Welcome to PCF, version %s\n%!" version in
   let lexbuf = Lexing.from_channel input_channel in
-  let prog = Textemplatecoreparser.componant Textemplatecorelexer.lex lexbuf in
-  let _ = Printf.printf "Recognized: " in
-  Textemplatecoreast.print_componant stdout prog;;
+  try
+    let _ = Printf.printf "        Welcome to PCF, version %s\n%!" version in
+    let prog = Textemplatecoreparser.componant Textemplatecorelexer.lex lexbuf in
+    let _ = Printf.printf "Recognized: " in
+    Textemplatecoreast.print_componant stdout prog
+  with
+  | End_of_file -> ()
+  | Parsing.Parse_error ->
+      let sp = Lexing.lexeme_start_p lexbuf in
+      let ep = Lexing.lexeme_end_p lexbuf in
+      Format.eprintf
+        "@[File %S, line %i, characters %i-%i:@ Syntax error.@]@\n"
+        sp.Lexing.pos_fname
+        sp.Lexing.pos_lnum
+        (sp.Lexing.pos_cnum - sp.Lexing.pos_bol)
+        (ep.Lexing.pos_cnum - sp.Lexing.pos_bol)
+  | Textemplatecorelexer.LexError (sp, ep) ->
+      Format.eprintf
+        "@[File %S, line %i, characters %i-%i:@ Lexical error.@\n@]"
+        sp.Lexing.pos_fname
+        sp.Lexing.pos_lnum
+        (sp.Lexing.pos_cnum - sp.Lexing.pos_bol)
+        (ep.Lexing.pos_cnum - sp.Lexing.pos_bol)
+;;
 (*   while true do
     try
       let _ = Printf.printf  "> %!" in

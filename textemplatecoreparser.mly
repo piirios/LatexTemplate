@@ -10,9 +10,9 @@
 %token <string> STRING 
 %token <string> IDENT
 %token TRUE FALSE
-%token UNIT PLUS MINUS MULT DIV EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
+%token COLONEQUAL UNIT PLUS MINUS MULT DIV EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 
-%left EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
+%left EQUAL EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 %left PLUS MINUS
 %left MULT DIV
 // structure
@@ -26,17 +26,19 @@
 
 // keywords
 %token RETURN 
-%token LET
+%token LET MUT
 %token PRINT
-%token FOR WHILE LOOP
+%token FOR WHILE LOOP IN
 %token IF ELSE ELSIF
 %token TRUE FALSE
+%token BREAK
 
 %start componant
 %type <Textemplatecoreast.componant> componant
 
 %%
 
+//toplevel
 componant:
 | toplevel_lst { {core= $1} }
 ;
@@ -47,8 +49,53 @@ toplevel_lst:
 ;
 
 toplevel:
-| expr { Expression $1 }
+| expr SEMICOLON { Expression $1 }
+| instr { Instruction $1 }
 ;
+
+//variable decl
+
+var_decl_content:
+| LET IDENT COLONEQUAL expr { Declare ($2, Immutable, Scalar $4) }
+| LET MUT IDENT COLONEQUAL expr { Declare ($3, Mutable, Scalar $5) }
+| LET IDENT COLONEQUAL LBRACKET exprs RBRACKET { Declare ($2, Immutable, Array $5) }
+| LET MUT IDENT COLONEQUAL LBRACKET exprs RBRACKET { Declare ($3, Mutable, Array $6) }
+;
+
+//instruction
+
+instrs:
+| instr { [$1] }
+| instr SEMICOLON instrs { $1 :: $3 }
+;
+
+instr_scope:
+| LSIMPLEBRACE instrs RSIMPLEBRACE { $2 }
+
+instr:
+| IF expr instr_scope ELSE instr_scope
+    { If ($2, $3, $5) }
+| WHILE expr instr_scope
+    { While ($2, $3) }
+| LOOP instr_scope
+    { Loop ($2) }
+| FOR IDENT IN expr instr_scope
+    { For ($2, $4, $5) }
+| var_decl_content SEMICOLON { $1 }
+| IDENT COLONEQUAL expr SEMICOLON
+    { Assign ($1, $3) }
+| IDENT LBRACKET expr RBRACKET COLONEQUAL expr SEMICOLON
+    { ArrayWrite ($1, $3, $6) }
+| RETURN opt_expr SEMICOLON
+    { Return $2 }
+| IDENT LPAREN opt_exprs RPAREN SEMICOLON
+    { Iapp ($1, $3) }
+| PRINT LPAREN opt_exprs RPAREN SEMICOLON
+    { Print $3 }
+| BREAK SEMICOLON
+    { Break }
+;
+
 
 expr:
 | IDENT LPAREN opt_exprs RPAREN      { App ($1, $3) }
@@ -65,11 +112,19 @@ expr:
 | LPAREN expr RPAREN                 { $2 }
 | atom                           { $1 }
 | IDENT LBRACKET expr RBRACKET   { ArrayRead ($1, $3) }
+| expr DOUBLEDOT expr            { Range ($1, Some $3) }
+| expr DOUBLEDOT                 { Range ($1, None) }
 ;
 
 opt_exprs:
 | { [] }
-| expr exprs               { $1 :: $2 }
+| expr { [$1] }
+| expr COMMA opt_exprs               { $1 :: $3 }
+;
+
+opt_expr:
+| { Unit }
+| expr               { $1 }
 ;
 
 exprs:

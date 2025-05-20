@@ -60,28 +60,46 @@
     in
     Char.chr (val1 * 16 + val2);;
 
+    exception LexError of (Lexing.position * Lexing.position) ;;
+let line_number = ref 0 ;;
+
+let incr_line_number lexbuf =
+  let pos = lexbuf.Lexing.lex_curr_p in
+  lexbuf.Lexing.lex_curr_p <- { pos with
+    Lexing.pos_lnum = pos.Lexing.pos_lnum + 1 ;
+    Lexing.pos_bol = pos.Lexing.pos_cnum }
+;;
+
 }
 
 let newline = ('\010' | '\013' | "\013\010")
 
 rule lex = parse
-    (' ' | '\t' | newline )
-      { lex lexbuf }     (* on passe les espaces *)
+    (' ' | '\t' )
+      { lex lexbuf }  
+     | newline
+    { incr_line_number lexbuf ;
+      lex lexbuf }   (* on passe les espaces *)
   | ['0'-'9']+ as lxm
       { INT(int_of_string lxm) }
   | [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '_' '0'-'9']* as lxm
       { match lxm with
         | "let" -> LET
+        | "mut" -> MUT
         | "if" -> IF
         | "elsif" -> ELSIF
         | "else" -> ELSE
         | "while" -> WHILE
         | "loop" -> LOOP
+        | "for" -> FOR
+        | "in" -> IN
         | "return" -> RETURN
         | "print" -> PRINT
         | "true" -> TRUE
         | "false" -> FALSE
+        | "break" -> BREAK
         | _ -> IDENT(lxm) }
+  | "="   { COLONEQUAL }
   | "=="   { EQUALEQUAL }
   | ">"   { GREATER} | "<"  { SMALLER }
   | ">="  { GREATEREQUAL} | "<="  { SMALLEREQUAL }
