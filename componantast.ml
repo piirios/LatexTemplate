@@ -28,6 +28,7 @@ type latexTemplate =
   | Latex of string
   | Ident of string
   | For of (string*expr*(latexTemplate list)) (* iterator over, iterator on, main *)
+  | Loop of latexTemplate list
   | Cond of (expr*(latexTemplate list)*(latexTemplate list))
 
 type fun_def = {

@@ -10,6 +10,7 @@ type expr =
   | Binop of (string * expr * expr)
   | Range of (expr * expr option)
   | Unit
+  | Template of (template list)
 and instr = 
   | While of (expr * (instr list))
   | For of (string * expr * (instr list))
@@ -28,6 +29,15 @@ and var_decl =
 and mutability = 
 | Mutable
 | Immutable
+and template = 
+| LatexContent of string 
+| Expression of expr
+| For of (string * expr * (template list))
+| While of (expr * (template list))
+| Loop of (template list)
+| If of (expr * (template list) * (template list))
+| Import of (string * (expr list))
+| Break
 type fun_def = {
   f_name : string ;
   params : string list ;

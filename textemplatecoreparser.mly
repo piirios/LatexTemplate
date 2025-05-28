@@ -34,6 +34,10 @@
 %token BREAK
 %token FN
 
+//template
+%token OPENTEMPLATE
+%token CLOSETEMPLATE
+
 %start componant
 %type <Textemplatecoreast.componant> componant
 
@@ -159,3 +163,10 @@ atom:
 | STRING         { String ($1) }
 | IDENT          { Ident ($1) }
 ;
+
+// Switch to Latex Mode
+template:
+| OPENTEMPLATE template_core CLOSETEMPLATE { $2 }
+
+template_core: 
+| 

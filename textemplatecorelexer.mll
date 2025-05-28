@@ -101,6 +101,9 @@ rule lex = parse
         | "fn" -> FN
         | _ -> IDENT(lxm) }
   | "="   { COLONEQUAL }
+  | "<% template %>" { OPENTEMPLATE }
+  | "</% template %>" { CLOSETEMPLATE }
+  | "<%"  { OPENTEMPLATETAG }
   | "=="   { EQUALEQUAL }
   | ">"   { GREATER} | "<"  { SMALLER }
   | ">="  { GREATEREQUAL} | "<="  { SMALLEREQUAL }
