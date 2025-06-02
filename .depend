@@ -1,22 +1,22 @@
-core.cmo : \
-    textemplatecoreparser.cmi \
-    textemplatecorelexer.cmo \
-    textemplatecoreast.cmo
-core.cmx : \
-    textemplatecoreparser.cmx \
-    textemplatecorelexer.cmx \
-    textemplatecoreast.cmx
-textemplatecoreast.cmo :
-textemplatecoreast.cmx :
-textemplatecorelexer.cmo : \
-    textemplatecoreparser.cmi
-textemplatecorelexer.cmx : \
-    textemplatecoreparser.cmx
-textemplatecoreparser.cmo : \
-    textemplatecoreast.cmo \
-    textemplatecoreparser.cmi
-textemplatecoreparser.cmx : \
-    textemplatecoreast.cmx \
-    textemplatecoreparser.cmi
-textemplatecoreparser.cmi : \
-    textemplatecoreast.cmo
+core/ast.cmo :
+core/ast.cmx :
+core/lexer.cmo : \
+    core/parser.cmi
+core/lexer.cmx : \
+    core/parser.cmx
+core/parser.cmo : \
+    core/ast.cmo \
+    core/parser.cmi
+core/parser.cmx : \
+    core/ast.cmx \
+    core/parser.cmi
+core/parser.cmi : \
+    core/ast.cmo
+main.cmo : \
+    core/parser.cmi \
+    core/lexer.cmo \
+    core/ast.cmo
+main.cmx : \
+    core/parser.cmx \
+    core/lexer.cmx \
+    core/ast.cmx

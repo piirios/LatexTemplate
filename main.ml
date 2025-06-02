@@ -26,9 +26,9 @@ let main() =
   let lexbuf = Lexing.from_channel input_channel in
   try
     let _ = Printf.printf "        Welcome to PCF, version %s\n%!" version in
-    let prog = Textemplatecoreparser.componant Textemplatecorelexer.lex lexbuf in
+    let prog = Parser.componant Lexer.lex lexbuf in
     let _ = Printf.printf "Recognized: " in
-    Textemplatecoreast.print_componant stdout prog
+    Ast.print_componant stdout prog
   with
   | End_of_file -> ()
   | Parsing.Parse_error ->
@@ -39,14 +39,14 @@ let main() =
         sp.Lexing.pos_fname
         sp.Lexing.pos_lnum
         (sp.Lexing.pos_cnum - sp.Lexing.pos_bol)
-        (ep.Lexing.pos_cnum - sp.Lexing.pos_bol)
-  | Textemplatecorelexer.LexError (sp, ep) ->
+        (ep.Lexing.pos_cnum - ep.Lexing.pos_bol)
+  | Lexer.LexError (sp, ep) ->
       Format.eprintf
         "@[File %S, line %i, characters %i-%i:@ Lexical error.@\n@]"
         sp.Lexing.pos_fname
         sp.Lexing.pos_lnum
         (sp.Lexing.pos_cnum - sp.Lexing.pos_bol)
-        (ep.Lexing.pos_cnum - sp.Lexing.pos_bol)
+        (ep.Lexing.pos_cnum - ep.Lexing.pos_bol)
 ;;
 (*   while true do
     try

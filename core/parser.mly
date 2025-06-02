@@ -1,5 +1,5 @@
 %{
-    open Textemplatecoreast ;;
+    open Ast ;;
 %}
 
 
@@ -39,7 +39,7 @@
 %token CLOSETEMPLATE
 
 %start componant
-%type <Textemplatecoreast.componant> componant
+%type <Ast.componant> componant
 
 %%
 
@@ -163,10 +163,3 @@ atom:
 | STRING         { String ($1) }
 | IDENT          { Ident ($1) }
 ;
-
-// Switch to Latex Mode
-template:
-| OPENTEMPLATE template_core CLOSETEMPLATE { $2 }
-
-template_core: 
-| 

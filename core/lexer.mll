@@ -1,5 +1,5 @@
 {
-  open Textemplatecoreparser ;;
+  open Parser ;;
   exception Eoi ;;
 
   let pc c = Printf.eprintf "Lu '%c'\n%!" c;;
@@ -103,7 +103,6 @@ rule lex = parse
   | "="   { COLONEQUAL }
   | "<% template %>" { OPENTEMPLATE }
   | "</% template %>" { CLOSETEMPLATE }
-  | "<%"  { OPENTEMPLATETAG }
   | "=="   { EQUALEQUAL }
   | ">"   { GREATER} | "<"  { SMALLER }
   | ">="  { GREATEREQUAL} | "<="  { SMALLEREQUAL }
