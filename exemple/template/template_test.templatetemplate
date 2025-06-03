@@ -1,15 +1,19 @@
-wowowoo 
+template %> 
+        wowowoo 
         <% if x + 3 == 4 %>
             wowaoao
         <% else %>
             qklqlqlqlql
-        </% if %>
+        </% endif %>
 
         <% loop %>
             mljmioihiuhih
+            <! val1 !>
             <% if x + 3 == 4 %>
                 <% break %>
-            </% if %>
-        </% loop %>
+            </% endif %>
+        </% endloop %>
 
         <% use Composant2(arg1, arg2, arg3) %/>
+
+    </% template

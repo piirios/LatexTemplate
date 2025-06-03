@@ -1,0 +1,5 @@
+template %>
+<! val1 !>
+<! x + 3 !>
+<! fonction(arg1, arg2) !>
+</% template 

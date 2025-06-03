@@ -1,0 +1,5 @@
+template %>
+<% for i in 1..3 %>
+Item numéro <! i !>
+<% endfor %>
+<% template

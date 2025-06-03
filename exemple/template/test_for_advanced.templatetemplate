@@ -1,0 +1,9 @@
+template %>
+<% for item in items %>
+<% if item > 5 %>
+  Gros item: <! item !>
+<% else %>
+  Petit item: <! item !>
+<% endif %>
+<% endfor %>
+<% template

@@ -39,6 +39,7 @@ $(EXEC): $(OBJS)
 # Clean up
 clean:
 	rm -f core/*.cm[io] core/*.cmx core/*~ core/.*~ core/*.o
+	rm -f *.cm[io] *.cmx *.o
 	rm -f core/parser.mli
 	rm -f $(GENERATED)
 	rm -f $(EXEC)

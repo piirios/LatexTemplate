@@ -1,5 +1,7 @@
 %{
     open Ast ;;
+    open Templateparser ;;
+    open Templatelexer ;;
 %}
 
 

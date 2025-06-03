@@ -1,0 +1,8 @@
+template %>
+<% while true %>
+<% if counter > 10 %>
+  <% break %>
+<% endif %>
+Counter: <! counter !>
+<% endwhile %>
+<% template

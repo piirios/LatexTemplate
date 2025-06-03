@@ -1,0 +1,5 @@
+template %>
+<% while x > 0 %>
+Valeur de x: <! x !>
+<% endwhile %>
+<% template

@@ -1,0 +1,7 @@
+template %>
+<% if x + 3 == 4 %>
+    wowaoao
+<% else %>
+    qklqlqlqlql
+<% endif %>
+</% template 

@@ -1,0 +1,5 @@
+ template %>
+<% if x == 4 %>
+  Hello World
+<% endif %>
+</% template
