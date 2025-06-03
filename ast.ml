@@ -50,9 +50,6 @@ type top_level =
   | Expression of expr
   | Function of fun_def
 
-type componant = {
-  core: top_level list;
-}
 
 (* ////////// PRINT //////////*) 
 
@@ -166,5 +163,5 @@ let rec print_toplevel_lst oc = function
 ;;
 
 let print_componant oc comp = 
-  print_toplevel_lst oc comp.core
+  print_toplevel_lst oc comp
 ;;

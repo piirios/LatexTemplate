@@ -8,8 +8,8 @@ COMPFLAGS=
 EXEC = main
 
 # Fichiers compilés, à produire pour fabriquer l'exécutable
-CORE_SOURCES = core/ast.ml main.ml
-GENERATED = core/lexer.ml core/parser.ml core/parser.mli
+CORE_SOURCES = ast.ml main.ml
+GENERATED = lexer.ml parser.ml parser.mli
 MLIS =
 OBJS = $(GENERATED:.ml=.cmo) $(CORE_SOURCES:.ml=.cmo)
 
@@ -17,17 +17,17 @@ OBJS = $(GENERATED:.ml=.cmo) $(CORE_SOURCES:.ml=.cmo)
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CAMLC) $(COMPFLAGS) -I core $(OBJS) -o $(EXEC)
+	$(CAMLC) $(COMPFLAGS) $(OBJS) -o $(EXEC)
 
 .SUFFIXES:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 .SUFFIXES: .mll .mly
 
 .ml.cmo:
-	$(CAMLC) $(COMPFLAGS) -I core -c $<
+	$(CAMLC) $(COMPFLAGS) -c $<
 
 .mli.cmi:
-	$(CAMLC) $(COMPFLAGS) -I core -c $<
+	$(CAMLC) $(COMPFLAGS) -c $<
 
 .mll.ml:
 	$(CAMLLEX) $<
@@ -38,26 +38,25 @@ $(EXEC): $(OBJS)
 
 # Clean up
 clean:
-	rm -f core/*.cm[io] core/*.cmx core/*~ core/.*~ core/*.o
-	rm -f *.cm[io] *.cmx *.o
-	rm -f core/parser.mli
+	rm -f *.cm[io] *.cmx *~ .*~ *.o
+	rm -f parser.mli
 	rm -f $(GENERATED)
 	rm -f $(EXEC)
 	rm -f tarball-enonce.tgz tarball-solution.tgz
 
 # Dependencies
 depend: $(CORE_SOURCES) $(GENERATED) $(MLIS)
-	$(CAMLDEP) -I core $(CORE_SOURCES) $(GENERATED) $(MLIS) > .depend
+	$(CAMLDEP) $(CORE_SOURCES) $(GENERATED) $(MLIS) > .depend
 
 include .depend
 
 tarball-enonce:
 	rm -f tarball-enonce.tgz
 	tar cvzhf tarball-enonce.tgz \
-		std.pdf Makefile fact.pcf core/ast.ml core/lexer.mll core/loop.ml core/parser-eleves.mly
+		std.pdf Makefile fact.pcf ast.ml lexer.mll parser.mly
 
 tarball-solution:
 	rm -f tarball-solution.tgz
 	tar cvzhf tarball-solution.tgz \
-		ctd.pdf Makefile fact.pcf core/ast.ml core/lexer.mll core/loop.ml core/parser.mly
+		ctd.pdf Makefile fact.pcf ast.ml lexer.mll parser.mly
 

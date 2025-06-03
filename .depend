@@ -1,22 +1,22 @@
-core/ast.cmo :
-core/ast.cmx :
-core/lexer.cmo : \
-    core/parser.cmi
-core/lexer.cmx : \
-    core/parser.cmx
-core/parser.cmo : \
-    core/ast.cmo \
-    core/parser.cmi
-core/parser.cmx : \
-    core/ast.cmx \
-    core/parser.cmi
-core/parser.cmi : \
-    core/ast.cmo
+ast.cmo :
+ast.cmx :
+lexer.cmo : \
+    parser.cmi
+lexer.cmx : \
+    parser.cmx
 main.cmo : \
-    core/parser.cmi \
-    core/lexer.cmo \
-    core/ast.cmo
+    parser.cmi \
+    lexer.cmo \
+    ast.cmo
 main.cmx : \
-    core/parser.cmx \
-    core/lexer.cmx \
-    core/ast.cmx
+    parser.cmx \
+    lexer.cmx \
+    ast.cmx
+parser.cmo : \
+    ast.cmo \
+    parser.cmi
+parser.cmx : \
+    ast.cmx \
+    parser.cmi
+parser.cmi : \
+    ast.cmo

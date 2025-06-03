@@ -1,0 +1,5 @@
+fn TestComposant(arg1, arg2) {
+    let val1 = 10;
+    print("Hello");
+    return <% template %>Hello World<% if true %>Content vrai<% endif %><% template %>;
+} 

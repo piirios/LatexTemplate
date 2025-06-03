@@ -1,19 +1,19 @@
-fn Composant(arg1, arg2, arg3) {
     fn special_print(wow) {
-        print("special print:")
-        print(wow)
-        print("EOF special print\n")
+        print("special print:");
+        print(wow);
+        print("EOF special print\n");
     }
 
+fn Composant(arg1, arg2, arg3) {
     let mut val1 = params1;
     let val2 = params1 + params2;
-    val1 = ;
+    val1 = 1;
     for i in 1..25 {
-        print(i)
+        print(i);
     }
     loop {
         val1 = val1 + 1;
-        special_print(val1)
+        special_print(val1);
         break;
     }
     return <% template %> 
@@ -26,13 +26,13 @@ fn Composant(arg1, arg2, arg3) {
 
         <% loop %>
             mljmioihiuhih
-            <! val1 !>
+            
             <% if x + 3 == 4 %>
                 <% break %>
-            </% if %>
-        </% loop %>
+            <% endif %>
+        <% endloop %>
 
-        <% use Composant2(arg1, arg2, arg3) %/>
+        <% use Composant2(arg1, arg2, arg3) %>
 
-    </% template %>
+    <% template %>;
 }
