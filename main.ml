@@ -38,12 +38,14 @@ let main () =
     Printf.printf "✅ Parsing réussi!
 
 ";
-    Printf.printf "=== ARBRE DE SYNTAXE ABSTRAIT (AST) ===
+    Printf.printf "=== STRUCTURE AST (MODE DEBUG) ===
 ";
     List.iter
       (fun item ->
-        Ast.print_toplevel stdout item;
-        Printf.printf "\n----------------------------------------\n")
+        Ast.print_dbg_top_level stdout item;
+        Printf.printf "
+----------------------------------------
+")
       toplevel_items;
     Printf.printf "
 🏁 Analyse terminée.

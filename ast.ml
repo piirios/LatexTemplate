@@ -165,3 +165,92 @@ let rec print_toplevel_lst oc = function
 let print_componant oc comp = 
   print_toplevel_lst oc comp
 ;;
+
+(* ////////// DEBUG PRINT (dbg! style) //////////*)
+
+let rec print_dbg_list_g start_char end_char sep_string print_item oc = function
+  | [] -> Printf.fprintf oc "%c%c" start_char end_char
+  | hd :: tl ->
+    Printf.fprintf oc "%c" start_char;
+    print_item oc hd;
+    List.iter (fun item -> Printf.fprintf oc "%s" sep_string; print_item oc item) tl;
+    Printf.fprintf oc "%c" end_char
+
+let print_dbg_string_list oc sl =
+  print_dbg_list_g '[' ']' "; " (fun o s -> Printf.fprintf o "\"%s\"" s) oc sl
+
+(* Start of the mutually recursive block for dbg printers *)
+let rec print_dbg_expr_list oc el =
+  print_dbg_list_g '[' ']' "; " print_dbg_expr oc el
+
+and print_dbg_expr_option oc eo =
+  match eo with
+  | None -> Printf.fprintf oc "None"
+  | Some e -> Printf.fprintf oc "Some(%a)" print_dbg_expr e
+
+and print_dbg_expr oc = function
+  | Int i -> Printf.fprintf oc "Int(%d)" i
+  | Bool b -> Printf.fprintf oc "Bool(%b)" b
+  | String s -> Printf.fprintf oc "String(\"%s\")" (String.escaped s)
+  | Ident s -> Printf.fprintf oc "Ident(\"%s\")" s
+  | ArrayRead (name, idx) -> Printf.fprintf oc "ArrayRead(\"%s\", %a)" name print_dbg_expr idx
+  | App (fname, expr_lst) -> Printf.fprintf oc "App(\"%s\", %a)" fname print_dbg_expr_list expr_lst
+  | Monop (op, e) -> Printf.fprintf oc "Monop(\"%s\", %a)" op print_dbg_expr e
+  | Binop (op, e1, e2) -> Printf.fprintf oc "Binop(\"%s\", %a, %a)" op print_dbg_expr e1 print_dbg_expr e2
+  | Range (e1, e2_opt) -> Printf.fprintf oc "Range(%a, %a)" print_dbg_expr e1 print_dbg_expr_option e2_opt
+  | Unit -> Printf.fprintf oc "Unit"
+  | Template tl -> Printf.fprintf oc "Template(%a)" print_dbg_template_list tl
+
+and print_dbg_mutability oc = function
+  | Mutable -> Printf.fprintf oc "Mutable"
+  | Immutable -> Printf.fprintf oc "Immutable"
+
+and print_dbg_var_decl oc = function
+  | Scalar e -> Printf.fprintf oc "Scalar(%a)" print_dbg_expr e
+  | Array el -> Printf.fprintf oc "Array(%a)" print_dbg_expr_list el
+
+and print_dbg_instr_list oc il =
+  print_dbg_list_g '[' ']' "; " print_dbg_instr oc il
+
+and print_dbg_instr oc = function
+  | While (e, il) -> Printf.fprintf oc "While(%a, %a)" print_dbg_expr e print_dbg_instr_list il
+  | For (s, e, il) -> Printf.fprintf oc "For(\"%s\", %a, %a)" s print_dbg_expr e print_dbg_instr_list il
+  | Loop il -> Printf.fprintf oc "Loop(%a)" print_dbg_instr_list il
+  | If (e, il1, il2) -> Printf.fprintf oc "If(%a, %a, %a)" print_dbg_expr e print_dbg_instr_list il1 print_dbg_instr_list il2
+  | Assign (s, e) -> Printf.fprintf oc "Assign(\"%s\", %a)" s print_dbg_expr e
+  | Declare (s, m, vd) -> Printf.fprintf oc "Declare(\"%s\", %a, %a)" s print_dbg_mutability m print_dbg_var_decl vd
+  | ArrayWrite (s, e1, e2) -> Printf.fprintf oc "ArrayWrite(\"%s\", %a, %a)" s print_dbg_expr e1 print_dbg_expr e2
+  | Return e -> Printf.fprintf oc "Return(%a)" print_dbg_expr e
+  | Iapp (s, el) -> Printf.fprintf oc "Iapp(\"%s\", %a)" s print_dbg_expr_list el
+  | Print el -> Printf.fprintf oc "Print(%a)" print_dbg_expr_list el
+  | Break -> Printf.fprintf oc "Break" (* Instruction Break *)
+
+and print_dbg_template_list oc tl =
+  print_dbg_list_g '[' ']' "; " print_dbg_template oc tl
+  
+and print_dbg_template oc = function
+  | LatexContent s -> Printf.fprintf oc "LatexContent(\"%s\")" (String.escaped s)
+  | Expression e -> Printf.fprintf oc "Expression(%a)" print_dbg_expr e
+  | For (s, e, tl) -> Printf.fprintf oc "For(\"%s\", %a, %a)" s print_dbg_expr e print_dbg_template_list tl
+  | While (e, tl) -> Printf.fprintf oc "While(%a, %a)" print_dbg_expr e print_dbg_template_list tl
+  | Loop tl -> Printf.fprintf oc "Loop(%a)" print_dbg_template_list tl
+  | If (e, tl1, tl2) -> Printf.fprintf oc "If(%a, %a, %a)" print_dbg_expr e print_dbg_template_list tl1 print_dbg_template_list tl2
+  | Import (s, el) -> Printf.fprintf oc "Import(\"%s\", %a)" s print_dbg_expr_list el
+  | Break -> Printf.fprintf oc "Break" (* Template Break *)
+
+(* End of the mutually recursive block *)
+
+let print_dbg_fun_def oc (fd : fun_def) =
+  Printf.fprintf oc "FunDef { f_name = \"%s\"; params = %a; body = %a }"
+    fd.f_name
+    print_dbg_string_list fd.params
+    print_dbg_instr_list fd.body
+
+let print_dbg_top_level oc = function
+  | Instruction i -> Printf.fprintf oc "Instruction(%a)" print_dbg_instr i
+  | Expression e -> Printf.fprintf oc "Expression(%a)" print_dbg_expr e
+  | Function fd -> Printf.fprintf oc "Function(%a)" print_dbg_fun_def fd
+
+let print_dbg_top_level_list oc tll =
+  print_dbg_list_g '[' ']' ";\\n" print_dbg_top_level oc tll
+;;
