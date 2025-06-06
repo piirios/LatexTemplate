@@ -45,7 +45,7 @@ let main () =
     let resolved_items, namespace = Import.resolve_imports toplevel_items filename in
     let fun_count, var_count = Namespace.count_names namespace in
     let fun_tbl = Mem.init_functions_table fun_count in 
-    Mem.load_function_into_table fun_tbl resolved_items;
+    let toplvl_inst_expr = Mem.load_function_into_table fun_tbl resolved_items in
     Printf.printf "✅ %d fonctions et %d variables trouvées\n%!" fun_count var_count;
     Printf.printf "=== STRUCTURE AST (MODE DEBUG) ===
 ";

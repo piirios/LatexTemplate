@@ -33,8 +33,10 @@ main.cmx : \
     exception_content.cmx \
     ast.cmx
 mem.cmo : \
+    subst.cmo \
     ast.cmo
 mem.cmx : \
+    subst.cmx \
     ast.cmx
 namespace.cmo : \
     exception_content.cmo \
@@ -50,3 +52,9 @@ parser.cmx : \
     parser.cmi
 parser.cmi : \
     ast.cmo
+sem.cmo :
+sem.cmx :
+subst.cmo : \
+    ast.cmo
+subst.cmx : \
+    ast.cmx
