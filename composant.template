@@ -1,0 +1,40 @@
+use tests/composant2;
+
+fn special_print(wow) {
+    print("special print:");
+    print(wow);
+    print("EOF special print\n");
+}
+
+fn Composant(arg1, arg2, arg3) {
+    let mut val1 = params1;
+    let val2 = params1 + params2;
+    val1 = 1;
+    for i in 1..25 {
+        print(i);
+    }
+    loop {
+        val1 = val1 + 1;
+        special_print(val1);
+        break;
+    }
+    return <% template %> 
+        wowowoo 
+        <% if x + 3 == 4 %>
+            wowaoao
+        <% else %>
+            qklqlqlqlql
+        </% endif %>
+
+        <% loop %>
+            mljmioihiuhih
+            
+            <% if x + 3 == 4 %>
+                <% break %>
+            <% endif %>
+        <% endloop %>
+
+        <% use Composant2(arg1, arg2, arg3) %>
+
+    <% endtemplate %>;
+}

@@ -108,7 +108,7 @@ rule lex = parse
       { VAR_END }
   | "<%template" | "<% template"
       { TEMPLATE_START }
-  | "template%>" | "template %>" | " template%>" | " template %>"
+  | "template%>" | "template %>" | " endtemplate%>" | " endtemplate %>"
       { TEMPLATE_END }
   | ['0'-'9']+ as lxm
       { INT(int_of_string lxm) }

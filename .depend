@@ -1,5 +1,17 @@
 ast.cmo :
 ast.cmx :
+exception_content.cmo :
+exception_content.cmx :
+import.cmo : \
+    parser.cmi \
+    namespace.cmo \
+    lexer.cmo \
+    ast.cmo
+import.cmx : \
+    parser.cmx \
+    namespace.cmx \
+    lexer.cmx \
+    ast.cmx
 lexer.cmo : \
     parser.cmi
 lexer.cmx : \
@@ -7,10 +19,20 @@ lexer.cmx : \
 main.cmo : \
     parser.cmi \
     lexer.cmo \
+    import.cmo \
+    exception_content.cmo \
     ast.cmo
 main.cmx : \
     parser.cmx \
     lexer.cmx \
+    import.cmx \
+    exception_content.cmx \
+    ast.cmx
+namespace.cmo : \
+    exception_content.cmo \
+    ast.cmo
+namespace.cmx : \
+    exception_content.cmx \
     ast.cmx
 parser.cmo : \
     ast.cmo \

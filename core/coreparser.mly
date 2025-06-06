@@ -1,44 +1,71 @@
 %{
     open Ast ;;
+    open Templateparser ;;
+    open Templatelexer ;;
 %}
 
-// tokens de base
+
+// artrithmetique
 %token EOF
 %token <int> INT 
 %token <float> FLOAT 
 %token <string> STRING 
 %token <string> IDENT
-%token <string> TEMPLATE_STRING
+%token TRUE FALSE
+%token COLONEQUAL UNIT PLUS MINUS MULT DIV EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 
-// opérateurs arithmétiques
-%token EQUALEQUAL COLONEQUAL PLUS MINUS MULT DIV GREATER SMALLER GREATEREQUAL SMALLEREQUAL
-
-%left EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
+%left EQUAL EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
 %left PLUS MINUS
 %left MULT DIV
-
 // structure
-%token LPAREN RPAREN COMMA
+%token LPAREN RPAREN
 %token LSIMPLEBRACE RSIMPLEBRACE
 %token LBRACKET RBRACKET
-%token SEMICOLON DOUBLEDOT UNIT
+//%token LDOUBLEBRACE RDOUBLEBRACE
+%token SEMICOLON COMMA
+//%token WHERE
+%token DOUBLEDOT
 
-// mots-clés pour le core
-%token LET MUT RETURN PRINT FOR WHILE LOOP IN IF ELSE ELSIF TRUE FALSE BREAK FN
+// keywords
+%token RETURN 
+%token LET MUT
+%token PRINT
+%token FOR WHILE LOOP IN
+%token IF ELSE ELSIF
+%token TRUE FALSE
+%token BREAK
+%token FN
 
-// mots-clés pour template
-%token TEMPLATE ENDIF ENDLOOP ENDFOR ENDWHILE USE
-%token TEMPLATE_START TEMPLATE_END
-%token VAR_START VAR_END
+//template
+%token OPENTEMPLATE
+%token CLOSETEMPLATE
 
-%start componants
-%type <Ast.top_level list> componants
+%start componant
+%type <Ast.componant> componant
 
 %%
 
-componants:
+//toplevel
+componant:
+| toplevel_lst { {core= $1} }
+;
+
+toplevel_lst:
 | EOF { [] }
-| toplevel componants { $1 :: $2 }
+| toplevel toplevel_lst { $1 :: $2 }
+;
+
+toplevel:
+| expr SEMICOLON { Expression $1 }
+| instr { Instruction $1 }
+| fun_def { Function $1 }
+;
+
+//function
+
+fun_def:
+| FN IDENT LPAREN opt_params RPAREN instr_scope
+    { { f_name = $2 ; params = $4 ; body = $6 } }
 ;
 
 opt_params:
@@ -51,26 +78,8 @@ params:
 | COMMA IDENT params { $2 :: $3 }
 ;
 
-// Core language body
-core_body:
-| { [] }
-| toplevel core_body { $1 :: $2 }
-;
+//variable decl
 
-toplevel:
-| expr SEMICOLON { Expression $1 }
-| instr { Instruction $1 }
-| fun_def { Function $1 }
-| USE IDENT SEMICOLON { Import $2 }
-;
-
-// Function definition
-fun_def:
-| FN IDENT LPAREN opt_params RPAREN instr_scope
-    { { f_name = $2 ; params = $4 ; body = $6 } }
-;
-
-// Variable declaration
 var_decl_content:
 | LET IDENT COLONEQUAL expr { Declare ($2, Immutable, Scalar $4) }
 | LET MUT IDENT COLONEQUAL expr { Declare ($3, Mutable, Scalar $5) }
@@ -78,7 +87,8 @@ var_decl_content:
 | LET MUT IDENT COLONEQUAL LBRACKET exprs RBRACKET { Declare ($3, Mutable, Array $6) }
 ;
 
-// Instructions
+//instruction
+
 instrs:
 | instr { [$1] }
 | instr instrs { $1 :: $2 }
@@ -86,13 +96,10 @@ instrs:
 
 instr_scope:
 | LSIMPLEBRACE instrs RSIMPLEBRACE { $2 }
-;
 
 instr:
 | IF expr instr_scope ELSE instr_scope
     { If ($2, $3, $5) }
-| IF expr instr_scope
-    { If ($2, $3, []) }
 | WHILE expr instr_scope
     { While ($2, $3) }
 | LOOP instr_scope
@@ -114,43 +121,9 @@ instr:
     { Break }
 ;
 
-// Template parsing
-template:
-| TEMPLATE_START template_body TEMPLATE_END { $2 }
-;
-
-template_body:
-| { [] }
-| template_element template_body { $1 :: $2 }
-;
-
-template_element:
-| TEMPLATE_STRING { LatexContent $1 }
-| IF expr template_body opt_else ENDIF
-    { If ($2, $3, $4) }
-| FOR IDENT IN expr template_body ENDFOR
-    { For ($2, $4, $5) }
-| WHILE expr template_body ENDWHILE
-    { While ($2, $3) }
-| LOOP template_body ENDLOOP
-    { Loop $2 }
-| USE IDENT LPAREN opt_exprs RPAREN 
-    { Import ($2, $4) }
-| BREAK 
-    { Break }
-| VAR_START expr VAR_END 
-    { Expression $2 }
-| IDENT 
-    { Expression (Ident $1) }
-;
-
-opt_else:
-| { [] }
-| ELSE template_body { $2 }
-;
-
-// Expressions
+//expression
 expr:
+| IDENT LPAREN opt_exprs RPAREN      { App ($1, $3) }
 | expr EQUALEQUAL expr           { Binop ("==", $1, $3) }
 | expr GREATER expr              { Binop (">", $1, $3) }
 | expr GREATEREQUAL expr         { Binop (">=", $1, $3) }
@@ -160,37 +133,40 @@ expr:
 | expr MINUS expr                { Binop ("-", $1, $3) }
 | expr MULT expr                 { Binop ("*", $1, $3) }
 | expr DIV expr                  { Binop ("/", $1, $3) }
+| MINUS expr                     { Monop ("-", $2) }
+| LPAREN expr RPAREN                 { $2 }
+| atom                           { $1 }
+| IDENT LBRACKET expr RBRACKET   { ArrayRead ($1, $3) }
 | expr DOUBLEDOT expr            { Range ($1, Some $3) }
 | expr DOUBLEDOT                 { Range ($1, None) }
-| MINUS expr                     { Monop ("-", $2) }
-| LPAREN expr RPAREN             { $2 }
-| atom                           { $1 }
-| IDENT LPAREN opt_exprs RPAREN  { App ($1, $3) }
-| IDENT LBRACKET expr RBRACKET   { ArrayRead ($1, $3) }
-| template                       { Template ($1) }
 ;
 
 opt_exprs:
 | { [] }
 | expr { [$1] }
-| expr COMMA opt_exprs { $1 :: $3 }
+| expr COMMA opt_exprs               { $1 :: $3 }
 ;
 
 opt_expr:
 | { Unit }
-| expr { $1 }
+| expr               { $1 }
 ;
 
 exprs:
 | { [] }
-| COMMA expr exprs { $2 :: $3 }
+| COMMA expr exprs         { $2 :: $3 }
 ;
 
+//template
+template:
+| OPENTEMPLATE 
+
+//base
 atom:
+| UNIT           { Unit }
 | INT            { Int ($1) }
+| TRUE           { Bool (true) }
+| FALSE          { Bool (false) }
 | STRING         { String ($1) }
 | IDENT          { Ident ($1) }
-| TRUE           { Bool true }
-| FALSE          { Bool false }
-| UNIT           { Unit }
 ;

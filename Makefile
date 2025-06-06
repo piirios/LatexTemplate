@@ -7,11 +7,15 @@ COMPFLAGS=
 
 EXEC = main
 
-# Fichiers compilés, à produire pour fabriquer l'exécutable
-CORE_SOURCES = ast.ml main.ml
+# Fichiers générés par ocamllex et ocamlyacc
 GENERATED = lexer.ml parser.ml parser.mli
+
+# Tous les fichiers .ml sauf les fichiers générés
+CORE_SOURCES = $(filter-out $(GENERATED), $(wildcard *.ml))
+
 MLIS =
-OBJS = $(GENERATED:.ml=.cmo) $(CORE_SOURCES:.ml=.cmo)
+# Ordre correct des objets selon les dépendances
+OBJS = ast.cmo exception_content.cmo namespace.cmo parser.cmo lexer.cmo import.cmo main.cmo
 
 # Building the world
 all: $(EXEC)

@@ -1,4 +1,5 @@
 open Ast
+open Import
 
 let version = "0.01" (* Ou la version actuelle de votre projet *)
 
@@ -38,6 +39,13 @@ let main () =
     Printf.printf "✅ Parsing réussi!
 
 ";
+    let filename = if input_channel <> stdin then
+      let full_name = Sys.argv.(1) in
+      try
+        Filename.chop_extension full_name
+      with Invalid_argument _ -> full_name
+    else "stdin" in
+    let resolved_items, _ = resolve_imports toplevel_items filename in
     Printf.printf "=== STRUCTURE AST (MODE DEBUG) ===
 ";
     List.iter
@@ -46,7 +54,7 @@ let main () =
         Printf.printf "
 ----------------------------------------
 ")
-      toplevel_items;
+      resolved_items;
     Printf.printf "
 🏁 Analyse terminée.
 %!";
@@ -72,6 +80,14 @@ let main () =
 %!" msg;
       if input_channel <> stdin then close_in input_channel;
       exit 2
+  | Exception_content.Duplicate_name dup_name ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_duplicate_name dup_name;
+      if input_channel <> stdin then close_in input_channel;
+      exit 1
+  | Exception_content.Duplicate_name_import dup_name ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_duplicate_name_import dup_name;
+      if input_channel <> stdin then close_in input_channel;
+      exit 1
 
 let () =
   if !Sys.interactive then () else main ()

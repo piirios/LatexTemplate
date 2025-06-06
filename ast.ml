@@ -49,6 +49,8 @@ type top_level =
   | Instruction of instr
   | Expression of expr
   | Function of fun_def
+  | Import of string
+
 
 
 (* ////////// PRINT //////////*) 
@@ -150,6 +152,7 @@ and print_inst_list oc = function
 let print_toplevel oc = function 
 | Instruction(inst) -> print_inst oc inst;
 | Expression(expr) ->  print_expr oc expr
+| Import(fname) -> Printf.fprintf oc "import %s;\n" fname
 | Function(func) ->  
     Printf.fprintf oc "function %s(%s) {\n%a}\n" 
       func.f_name 
@@ -250,6 +253,7 @@ let print_dbg_top_level oc = function
   | Instruction i -> Printf.fprintf oc "Instruction(%a)" print_dbg_instr i
   | Expression e -> Printf.fprintf oc "Expression(%a)" print_dbg_expr e
   | Function fd -> Printf.fprintf oc "Function(%a)" print_dbg_fun_def fd
+  | Import fname -> Printf.fprintf oc "Import(%s)" fname
 
 let print_dbg_top_level_list oc tll =
   print_dbg_list_g '[' ']' ";\\n" print_dbg_top_level oc tll
