@@ -1,6 +1,3 @@
-open Ast
-open Import
-
 let version = "0.01" (* Ou la version actuelle de votre projet *)
 
 let usage () =
@@ -45,7 +42,11 @@ let main () =
         Filename.chop_extension full_name
       with Invalid_argument _ -> full_name
     else "stdin" in
-    let resolved_items, _ = resolve_imports toplevel_items filename in
+    let resolved_items, namespace = Import.resolve_imports toplevel_items filename in
+    let fun_count, var_count = Namespace.count_names namespace in
+    let fun_tbl = Mem.init_functions_table fun_count in 
+    Mem.load_function_into_table fun_tbl resolved_items;
+    Printf.printf "✅ %d fonctions et %d variables trouvées\n%!" fun_count var_count;
     Printf.printf "=== STRUCTURE AST (MODE DEBUG) ===
 ";
     List.iter

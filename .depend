@@ -18,15 +18,23 @@ lexer.cmx : \
     parser.cmx
 main.cmo : \
     parser.cmi \
+    namespace.cmo \
+    mem.cmo \
     lexer.cmo \
     import.cmo \
     exception_content.cmo \
     ast.cmo
 main.cmx : \
     parser.cmx \
+    namespace.cmx \
+    mem.cmx \
     lexer.cmx \
     import.cmx \
     exception_content.cmx \
+    ast.cmx
+mem.cmo : \
+    ast.cmo
+mem.cmx : \
     ast.cmx
 namespace.cmo : \
     exception_content.cmo \

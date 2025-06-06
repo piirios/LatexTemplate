@@ -26,8 +26,8 @@ let filter_imports tplvls =
 (* Fonction permettant de resoudre tous les imports naivement *)
 let resolve_imports tplvls entrypoint = 
     let init_loaded_files = NameSet.singleton entrypoint in
-    let init_namespace = extract_names tplvls entrypoint in
     let imports, filtered_ast = filter_imports tplvls in
+    let init_namespace = extract_names filtered_ast entrypoint in
     let rec add_files tplvls_acc loaded_files namespace import_list = 
         match import_list with
         | [] -> (tplvls_acc, namespace)
