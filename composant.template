@@ -1,4 +1,5 @@
 use tests/composant2;
+use composant2;
 
 fn special_print(wow) {
     print("special print:");
