@@ -8,6 +8,7 @@
 %token <float> FLOAT 
 %token <string> STRING 
 %token <string> IDENT
+%token <string> IMPORT_PATH
 %token <string> TEMPLATE_STRING
 
 // opérateurs arithmétiques
@@ -62,6 +63,7 @@ toplevel:
 | instr { Instruction $1 }
 | fun_def { Function $1 }
 | USE IDENT SEMICOLON { Import $2 }
+| USE IMPORT_PATH SEMICOLON { Import $2 }
 ;
 
 // Function definition

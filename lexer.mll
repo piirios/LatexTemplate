@@ -117,7 +117,7 @@ rule lex = parse
       in_template_string lexbuf;
       let content = get_stored_template_string() in
       TEMPLATE_STRING content }
-  | [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '_' '0'-'9']* as lxm
+  |( ([ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '_' '0'-'9']* | "..") "/" )* [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '_' '0'-'9']* as lxm
       { match lxm with
         | "let" -> LET
         | "mut" -> MUT
@@ -139,7 +139,9 @@ rule lex = parse
         | "break" -> BREAK
         | "fn" -> FN
         | "use" -> USE
-        | _ -> IDENT(lxm) }
+        | _ when not (String.contains lxm '/' || String.contains lxm '.') -> IDENT(lxm) 
+        | _ -> IMPORT_PATH(lxm)
+        }
   | "="   { COLONEQUAL }
   | "=="   { EQUALEQUAL }
   | ">"   { GREATER} | "<"  { SMALLER }
