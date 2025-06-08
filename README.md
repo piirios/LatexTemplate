@@ -137,7 +137,7 @@ Contenu principal...
 ### Syntaxe des Templates
 
 ```latex
-<% template
+<% template %>
 \documentclass{article}
 \begin{document}
 
@@ -149,7 +149,7 @@ Contenu principal...
 Le montant total est de <% total %>€.
 
 \end{document}
-template %>
+<% endtemplate %>
 ```
 
 ### Interpolation et Calculs
@@ -158,11 +158,11 @@ template %>
 let prix_unitaire = 50;
 let quantite = 3;
 
-<% template
+<% template %>
 Prix unitaire: <% prix_unitaire %>€
 Quantité: <% quantite %>
 Total: <% prix_unitaire * quantite %>€
-template %>
+<% endtemplate %>
 ```
 
 ### Boucles dans Templates
@@ -171,13 +171,13 @@ template %>
 let services = ["Consultation", "Développement", "Formation"];
 let tarifs = [100, 80, 120];
 
-<% template
+<% template %>
 \begin{itemize}
 <% for i in 0..2 %>
 \item <% services[i] %>: <% tarifs[i] %>€
 <% endfor %>
 \end{itemize}
-template %>
+<% endtemplate %>
 ```
 
 ### Conditions dans Templates
@@ -185,7 +185,7 @@ template %>
 ```javascript
 let total = 1500;
 
-<% template
+<% template %>
 Montant: <% total %>€
 
 <% if total > 1000 %>
@@ -193,7 +193,25 @@ Montant: <% total %>€
 <% else %>
 Tarif standard
 <% endif %>
-template %>
+<% endtemplate %>
+```
+
+### Utilisation de Composants dans Templates
+
+```javascript
+<% template %>
+\documentclass{article}
+\begin{document}
+
+<% use CompanyHeader(nom_entreprise, adresse, ville) %>
+
+\section{Contenu}
+Voici le contenu principal...
+
+<% use CompanyFooter(nom_entreprise, message_footer) %>
+
+\end{document}
+<% endtemplate %>
 ```
 
 ## 💼 Exemple Complet : Générateur de Facture
@@ -207,7 +225,7 @@ let client = "Université ENSTA";
 fn generer_facture(services, tarifs, quantites) {
     let total = 0;
     
-    return <% template
+    return <% template %>
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{array}
@@ -245,7 +263,7 @@ fn generer_facture(services, tarifs, quantites) {
 \end{longtable}
 
 \end{document}
-    template %>;
+<% endtemplate %>;
 }
 
 fn main(argc, argv) {
