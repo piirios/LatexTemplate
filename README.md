@@ -106,12 +106,12 @@ fn main(argc, argv) {
 **`components/footer.template`** :
 ```javascript
 fn generer_footer() {
-    return <% template
+    return <% template %>
 \vfill
 \begin{center}
 \small Document généré par LatexTemplate
 \end{center}
-    template %>;
+    <% endtemplate %>;
 }
 ```
 
@@ -122,13 +122,13 @@ use components/footer;
 fn main(argc, argv) {
     let footer = generer_footer();  // Fonction importée
     
-    return <% template
+    return <% template %>
 \documentclass{article}
 \begin{document}
 Contenu principal...
 <% footer %>
 \end{document}
-    template %>;
+    <% endtemplate %>;
 }
 ```
 
