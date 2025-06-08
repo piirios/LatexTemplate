@@ -1,0 +1,69 @@
+// === COMPOSANT SERVICES ===
+// Composant pour générer des tableaux de services dynamiquement
+
+fn ServiceTable(title, color, services) {
+    // Calcul du total pour ce tableau
+    let mut total = 0;
+    for service in services {
+        total = total + service[2]; // service[2] = montant total
+    }
+    
+    return <% template %>
+\noindent\colorbox{<% color %>!10}{\textbf{\Large <% title %>}}
+
+\vspace{0.3cm}
+
+\begin{tabular}{|p{6cm}|p{2cm}|p{2cm}|p{3cm}|}
+    \hline
+    \textbf{Description} & \textbf{Quantité} & \textbf{Prix Unit.} & \textbf{Total} \\
+    \hline
+<% for i in 0..services.length-1 %>
+    <% services[i][0] %> & <% services[i][1] %> & <% services[i][2] / services[i][1] %> EUR & <% services[i][2] %> EUR \\
+<% endfor %>
+    \hline
+    \multicolumn{3}{|r|}{\textbf{Sous-total <% title %>:}} & \textbf{<% total %> EUR} \\
+    \hline
+\end{tabular}
+
+\vspace{0.8cm}
+    <% endtemplate %>;
+}
+
+fn DynamicServiceRows(base_service, count, rate_per_unit) {
+    return <% template %>
+<% for i in 1..count %>
+    <% base_service %> <% i %> & <% i * 2 %> & <% rate_per_unit %> EUR & <% i * 2 * rate_per_unit %> EUR \\
+<% endfor %>
+    <% endtemplate %>;
+}
+
+fn ServiceSummary(services_total, formation_total, expenses_total) {
+    let total_ht = services_total + formation_total + expenses_total;
+    let tva = total_ht * 20 / 100;
+    let total_ttc = total_ht + tva;
+    
+    return <% template %>
+\begin{center}
+    \colorbox{green!15}{\parbox{0.9\textwidth}{
+    \begin{center}
+        {\LARGE\textbf{RÉCAPITULATIF FINANCIER}}\\[0.5cm]
+        
+        \begin{tabular}{|p{6cm}|p{4cm}|}
+            \hline
+            \textbf{Catégorie} & \textbf{Montant} \\
+            \hline
+            Services techniques & <% services_total %> EUR \\
+            Formation \& support & <% formation_total %> EUR \\
+            Frais \& dépenses & <% expenses_total %> EUR \\
+            \hline
+            \textbf{Sous-total HT} & \textbf{<% total_ht %> EUR} \\
+            TVA (20\%) & <% tva %> EUR \\
+            \hline
+            \textbf{\Large TOTAL TTC} & \textbf{\Large <% total_ttc %> EUR} \\
+            \hline
+        \end{tabular}
+    \end{center}
+    }}
+\end{center}
+    <% endtemplate %>;
+} 

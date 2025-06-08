@@ -18,12 +18,12 @@ let rec alpha_substitution_instr sub_tbl (instr : Ast.instr) : Ast.instr = match
     | Ast.Assign(var, expr) ->
         let new_expr = alpha_substitution_expr sub_tbl expr in
         Ast.Assign(var, new_expr)
-    | Ast.Declare(var, mut, decl) ->
+    | Ast.Declare(var, decl) ->
         let new_decl = match decl with
         | Ast.Scalar(e) -> Ast.Scalar(alpha_substitution_expr sub_tbl e)
         | Ast.Array(es) -> Ast.Array(List.map (alpha_substitution_expr sub_tbl) es)
         in
-        Ast.Declare(var, mut, new_decl)
+        Ast.Declare(var, new_decl)
     | Ast.ArrayWrite(arr, idx, val_) ->
         let new_idx = alpha_substitution_expr sub_tbl idx in
         let new_val = alpha_substitution_expr sub_tbl val_ in

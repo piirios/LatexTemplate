@@ -17,7 +17,7 @@ and instr =
   | Loop of (instr list)
   | If of (expr * (instr list) * (instr list))
   | Assign of (string * expr)
-  | Declare of (string * mutability * var_decl)
+  | Declare of (string * var_decl)
   | ArrayWrite of (string * expr * expr)
   | Return of expr
   | Iapp of (string * (expr list))
@@ -26,9 +26,6 @@ and instr =
 and var_decl =
   | Scalar of expr 
   | Array of expr list
-and mutability = 
-| Mutable
-| Immutable
 and template = 
 | LatexContent of string 
 | Expression of expr
@@ -115,12 +112,12 @@ and print_inst oc = function
       print_inst_list else_body
 | Assign (var, expr) -> 
     Printf.fprintf oc "%s = %a;\n" var print_expr expr
-| Declare (var,mut,decl) -> 
+| Declare (var,decl) -> 
     Printf.fprintf oc "let %s = %a;\n" var (fun oc -> function
       | Scalar (expr) -> 
-          Printf.fprintf oc "%s%a" (if mut = Mutable then "mut " else "") print_expr expr
+          print_expr oc expr
       | Array (exprs) -> 
-          Printf.fprintf oc "%s[%a]" (if mut = Mutable then "mut " else "") 
+          Printf.fprintf oc "[%a]" 
             (fun oc e_lst -> 
               match e_lst with 
               | [] -> ()
@@ -204,9 +201,18 @@ and print_dbg_expr oc = function
   | Unit -> Printf.fprintf oc "Unit"
   | Template tl -> Printf.fprintf oc "Template(%a)" print_dbg_template_list tl
 
-and print_dbg_mutability oc = function
-  | Mutable -> Printf.fprintf oc "Mutable"
-  | Immutable -> Printf.fprintf oc "Immutable"
+and print_dbg_template_list oc tl =
+  print_dbg_list_g '[' ']' "; " print_dbg_template oc tl
+  
+and print_dbg_template oc = function
+  | LatexContent s -> Printf.fprintf oc "LatexContent(\"%s\")" (String.escaped s)
+  | Expression e -> Printf.fprintf oc "Expression(%a)" print_dbg_expr e
+  | For (s, e, tl) -> Printf.fprintf oc "For(\"%s\", %a, %a)" s print_dbg_expr e print_dbg_template_list tl
+  | While (e, tl) -> Printf.fprintf oc "While(%a, %a)" print_dbg_expr e print_dbg_template_list tl
+  | Loop tl -> Printf.fprintf oc "Loop(%a)" print_dbg_template_list tl
+  | If (e, tl1, tl2) -> Printf.fprintf oc "If(%a, %a, %a)" print_dbg_expr e print_dbg_template_list tl1 print_dbg_template_list tl2
+  | Import (s, el) -> Printf.fprintf oc "Import(\"%s\", %a)" s print_dbg_expr_list el
+  | Break -> Printf.fprintf oc "Break"
 
 and print_dbg_var_decl oc = function
   | Scalar e -> Printf.fprintf oc "Scalar(%a)" print_dbg_expr e
@@ -221,25 +227,12 @@ and print_dbg_instr oc = function
   | Loop il -> Printf.fprintf oc "Loop(%a)" print_dbg_instr_list il
   | If (e, il1, il2) -> Printf.fprintf oc "If(%a, %a, %a)" print_dbg_expr e print_dbg_instr_list il1 print_dbg_instr_list il2
   | Assign (s, e) -> Printf.fprintf oc "Assign(\"%s\", %a)" s print_dbg_expr e
-  | Declare (s, m, vd) -> Printf.fprintf oc "Declare(\"%s\", %a, %a)" s print_dbg_mutability m print_dbg_var_decl vd
+  | Declare (s, vd) -> Printf.fprintf oc "Declare(\"%s\", %a)" s print_dbg_var_decl vd
   | ArrayWrite (s, e1, e2) -> Printf.fprintf oc "ArrayWrite(\"%s\", %a, %a)" s print_dbg_expr e1 print_dbg_expr e2
   | Return e -> Printf.fprintf oc "Return(%a)" print_dbg_expr e
   | Iapp (s, el) -> Printf.fprintf oc "Iapp(\"%s\", %a)" s print_dbg_expr_list el
   | Print el -> Printf.fprintf oc "Print(%a)" print_dbg_expr_list el
-  | Break -> Printf.fprintf oc "Break" (* Instruction Break *)
-
-and print_dbg_template_list oc tl =
-  print_dbg_list_g '[' ']' "; " print_dbg_template oc tl
-  
-and print_dbg_template oc = function
-  | LatexContent s -> Printf.fprintf oc "LatexContent(\"%s\")" (String.escaped s)
-  | Expression e -> Printf.fprintf oc "Expression(%a)" print_dbg_expr e
-  | For (s, e, tl) -> Printf.fprintf oc "For(\"%s\", %a, %a)" s print_dbg_expr e print_dbg_template_list tl
-  | While (e, tl) -> Printf.fprintf oc "While(%a, %a)" print_dbg_expr e print_dbg_template_list tl
-  | Loop tl -> Printf.fprintf oc "Loop(%a)" print_dbg_template_list tl
-  | If (e, tl1, tl2) -> Printf.fprintf oc "If(%a, %a, %a)" print_dbg_expr e print_dbg_template_list tl1 print_dbg_template_list tl2
-  | Import (s, el) -> Printf.fprintf oc "Import(\"%s\", %a)" s print_dbg_expr_list el
-  | Break -> Printf.fprintf oc "Break" (* Template Break *)
+  | Break -> Printf.fprintf oc "Break"
 
 (* End of the mutually recursive block *)
 

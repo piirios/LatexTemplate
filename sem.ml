@@ -134,7 +134,7 @@ let rec eval_expr env fun_tbl expr =
       let arg_vals = List.map (eval_expr env fun_tbl) args in
       (try 
          let func_def = Hashtbl.find fun_tbl fname in
-         let new_env = init_env () in
+         let new_env = Hashtbl.copy env in
          List.iter2 (add_to_env new_env) func_def.Ast.params (List.map (fun v -> v) arg_vals);
          try
            List.iter (eval_instr new_env fun_tbl) func_def.Ast.body;
@@ -265,7 +265,7 @@ and eval_instr env fun_tbl instr =
   | Ast.Assign (var, expr) ->
       let val_result = eval_expr env fun_tbl expr in
       Hashtbl.replace env var val_result
-  | Ast.Declare (var, mutability, var_decl) ->
+  | Ast.Declare (var, var_decl) ->
       (match var_decl with
        | Ast.Scalar expr -> 
            let val_result = eval_expr env fun_tbl expr in

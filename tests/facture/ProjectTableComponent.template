@@ -1,0 +1,17 @@
+fn ProjectTable(project_name, services) {
+    return <% template %>
+\noindent\newline\textbf{Project Name:} <% project_name %>\par\vspace{0.3cm}
+\noindent
+\begin{tabular}{|p{7.5cm}|p{2cm}|p{2cm}|p{2.5cm}|}
+    \hline
+    \textbf{Description} & \textbf{Hours} & \textbf{Rate (\$)} & \textbf{Amount (\$)} \\
+    \hline
+    <% for service in services %>
+    <% service[0] %> & <% service[1] %> & <% service[2] %> & <% service[1] * service[2] %> \\
+    \hline
+    <% endfor %>
+    \multicolumn{3}{|l|}{\textbf{Total}} & <% let project_total = 0 %><% for service in services %><% project_total = project_total + (service[1] * service[2]) %><% endfor %><% project_total %> \\ \hline
+\end{tabular}
+\vspace{1cm}
+<% endtemplate %>;
+} 

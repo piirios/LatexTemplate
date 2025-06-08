@@ -1,0 +1,37 @@
+// === COMPOSANT HEADER ===
+// Composant réutilisable pour l'en-tête de facture
+
+fn Header(company_name, company_address, company_email, company_phone) {
+    return <% template %>
+\begin{center}
+    \colorbox{blue!15}{\parbox{\textwidth}{
+    \begin{center}
+        {\Huge\bfseries <% company_name %>}\\[0.4cm]
+        {\large <% company_address %>}\\[0.2cm]
+        \textbf{📧} <% company_email %> \quad \textbf{📞} <% company_phone %>
+    \end{center}
+    }}
+\end{center}
+
+\vspace{0.8cm}
+\rule{\textwidth}{2pt}
+\vspace{0.5cm}
+    <% endtemplate %>;
+}
+
+fn InvoiceTitle(invoice_number, invoice_date, client_name) {
+    return <% template %>
+\begin{center}
+    {\huge\textbf{FACTURE}}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{tabular}{@{}ll@{\hspace{3cm}}ll@{}}
+    \textbf{Numéro:} & <% invoice_number %> & \textbf{Date:} & <% invoice_date %> \\[0.3cm]
+    \multicolumn{4}{l}{\textbf{Facturé à:} \textit{<% client_name %>}} \\
+\end{tabular}
+
+\vspace{1cm}
+    <% endtemplate %>;
+} 

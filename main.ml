@@ -82,6 +82,24 @@ let main () =
     ) toplvl_inst_expr;
     );
 
+    (* EXÉCUTION DES INSTRUCTIONS GLOBALES *)
+    debug_printf "\n=== EXÉCUTION DES INSTRUCTIONS GLOBALES ===\n";
+    let env = Sem.init_env () in
+    List.iter (fun item ->
+      match item with
+      | Ast.Instruction inst -> 
+          debug_printf "Exécution instruction globale: ";
+          Ast.print_dbg_instr stdout inst;
+          debug_printf "\n";
+          ignore (Sem.eval_instr env fun_tbl inst)
+      | Ast.Expression expr ->
+          debug_printf "Évaluation expression globale: ";
+          Ast.print_dbg_expr stdout expr;
+          debug_printf "\n";
+          ignore (Sem.eval_expr env fun_tbl expr)
+      | _ -> ()
+    ) toplvl_inst_expr;
+
     (* Exécution de la fonction main si elle existe *)
     debug_printf "\n=== EXÉCUTION ===\n";
     (try 
@@ -93,8 +111,7 @@ let main () =
       let argv_list = Array.to_list (Array.map (fun s -> Sem.Vstring s) Sys.argv) in
       let argv_array = Sem.Varray argv_list in
       
-      (* Création de l'environnement initial *)
-      let env = Sem.init_env () in
+      (* Utilisation de l'environnement global existant *)
       Sem.add_to_env env "_argc_main" (Sem.Vint argc);
       Sem.add_to_env env "_argv_main" argv_array;
       

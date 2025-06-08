@@ -120,7 +120,6 @@ rule lex = parse
   |( ([ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '_' '0'-'9']* | "..") "/" )* [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '_' '0'-'9']* as lxm
       { match lxm with
         | "let" -> LET
-        | "mut" -> MUT
         | "if" -> IF
         | "elsif" -> ELSIF
         | "else" -> ELSE

@@ -31,7 +31,7 @@ let extract_names tplvls fname =
             if NameSourceSet.mem name_src sec_acc then 
                 raise (Exception_content.Duplicate_name (Exception_content.make_duplicate_name func.f_name fname))
             else extract_names_rec tl (NameSourceSet.add name_src sec_acc)
-        | Ast.Instruction(Ast.Declare(name, _, _)) :: tl ->
+        | Ast.Instruction(Ast.Declare(name, _)) :: tl ->
             let name_src = {name = name; source = fname; context = Variable} in
             if NameSourceSet.mem name_src sec_acc then
                 raise (Exception_content.Duplicate_name (Exception_content.make_duplicate_name name fname))

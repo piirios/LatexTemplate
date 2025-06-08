@@ -27,7 +27,7 @@
 %token SEMICOLON DOUBLEDOT UNIT
 
 // mots-clés pour le core
-%token LET MUT RETURN PRINT FOR WHILE LOOP IN IF ELSE ELSIF TRUE FALSE BREAK FN
+%token LET RETURN PRINT FOR WHILE LOOP IN IF ELSE ELSIF TRUE FALSE BREAK FN
 
 // mots-clés pour template
 %token TEMPLATE ENDIF ENDLOOP ENDFOR ENDWHILE USE
@@ -76,10 +76,8 @@ fun_def:
 
 // Variable declaration
 var_decl_content:
-| LET IDENT COLONEQUAL expr { Declare ($2, Immutable, Scalar $4) }
-| LET MUT IDENT COLONEQUAL expr { Declare ($3, Mutable, Scalar $5) }
-| LET IDENT COLONEQUAL LBRACKET exprs RBRACKET { Declare ($2, Immutable, Array $5) }
-| LET MUT IDENT COLONEQUAL LBRACKET exprs RBRACKET { Declare ($3, Mutable, Array $6) }
+| LET IDENT COLONEQUAL expr { Declare ($2, Scalar $4) }
+| LET IDENT COLONEQUAL LBRACKET exprs RBRACKET { Declare ($2, Array $5) }
 ;
 
 // Instructions
