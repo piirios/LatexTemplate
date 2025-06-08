@@ -2,7 +2,7 @@ fn Composant2(arg1, arg2, arg3) {
     let params1 = 0;
     let params2 = 3;
     let x = 1;
-    let mut val1 = params1;
+    let val1 = params1;
     let val2 = params1 + params2;
     val1 = 1;
     for i in 1..25 {

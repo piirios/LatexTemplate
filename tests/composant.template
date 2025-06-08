@@ -9,7 +9,7 @@ fn special_print(wow) {
 fn main(argc, argv) {
     let params1 = 0;
     let params2 = 3;
-    let mut val1 = params1;
+    let val1 = params1;
     let val2 = params1 + params2;
     let x = 1;
     let arg1 = "Premier argument";

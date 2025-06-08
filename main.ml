@@ -103,7 +103,6 @@ let main () =
     (* Exécution de la fonction main si elle existe *)
     debug_printf "\n=== EXÉCUTION ===\n";
     (try 
-      let main_func = Hashtbl.find fun_tbl "main" in
       debug_printf "🚀 Exécution de la fonction main...\n%!";
       
       (* Préparation des arguments argc et argv *)
