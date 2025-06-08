@@ -1,5 +1,14 @@
 let version = "0.01" (* Ou la version actuelle de votre projet *)
 
+let debug_mode = 
+  try 
+    Sys.getenv "DEBUG" = "1"
+  with Not_found -> false
+
+let debug_printf fmt = 
+  if debug_mode then Printf.printf fmt 
+  else Printf.ifprintf stdout fmt
+
 let usage () =
   Printf.eprintf
     "Usage: %s [fichier.template] [fichier_sortie.tex]
@@ -19,9 +28,7 @@ let main () =
         | name ->
             (try open_in name
             with Sys_error msg ->
-              Printf.eprintf "Erreur à l\'ouverture du fichier '%s': %s
-%!" name msg;
-              exit 1))
+              raise (Exception_content.File_error (Exception_content.make_file_error name "ouverture en lecture" msg))))
     | _ -> usage ()
   in
   let lexbuf = Lexing.from_channel input_channel in
@@ -48,37 +55,38 @@ let main () =
     let fun_tbl = Mem.init_functions_table fun_count in 
     let toplvl_inst_expr = Mem.load_function_into_table fun_tbl resolved_items in
     Printf.printf "✅ %d fonctions et %d variables trouvées\n%!" fun_count var_count;
-    Printf.printf "=== STRUCTURE AST (MODE DEBUG) ===
-";
-    Printf.printf "=== CONTENU DE LA TABLE DES FONCTIONS ===\n";
-    Hashtbl.iter (fun name func_def ->
-      Printf.printf "Fonction '%s':\n" name;
-      List.iter (fun inst -> 
-        Ast.print_dbg_instr stdout inst;
-        Printf.printf "\n"
-      ) func_def.Ast.body;
-      Printf.printf "----------------------------------------\n"
-    ) fun_tbl;
-
-    Printf.printf "\n=== INSTRUCTIONS/EXPRESSIONS DE HAUT NIVEAU ===\n";
-    List.iter (fun item ->
-      match item with
-      | Ast.Instruction inst -> 
-          Printf.printf "Instruction: ";
+    debug_printf "=== STRUCTURE AST (MODE DEBUG) ===\n";
+    debug_printf "=== CONTENU DE LA TABLE DES FONCTIONS ===\n";
+    if debug_mode then (
+      Hashtbl.iter (fun name func_def ->
+        debug_printf "Fonction '%s':\n" name;
+        List.iter (fun inst -> 
           Ast.print_dbg_instr stdout inst;
-          Printf.printf "\n"
-      | Ast.Expression expr ->
-          Printf.printf "Expression: ";
-          Ast.print_dbg_expr stdout expr;
-          Printf.printf "\n"
-      | _ -> ()
-    ) toplvl_inst_expr;
+          debug_printf "\n"
+        ) func_def.Ast.body;
+        debug_printf "----------------------------------------\n"
+      ) fun_tbl;
+
+      debug_printf "\n=== INSTRUCTIONS/EXPRESSIONS DE HAUT NIVEAU ===\n";
+      List.iter (fun item ->
+        match item with
+        | Ast.Instruction inst -> 
+            debug_printf "Instruction: ";
+            Ast.print_dbg_instr stdout inst;
+            debug_printf "\n"
+        | Ast.Expression expr ->
+            debug_printf "Expression: ";
+            Ast.print_dbg_expr stdout expr;
+            debug_printf "\n"
+        | _ -> ()
+      ) toplvl_inst_expr;
+    );
 
     (* Exécution de la fonction main si elle existe *)
-    Printf.printf "\n=== EXÉCUTION ===\n";
+    debug_printf "\n=== EXÉCUTION ===\n";
     (try 
       let main_func = Hashtbl.find fun_tbl "main" in
-      Printf.printf "🚀 Exécution de la fonction main...\n%!";
+      debug_printf "🚀 Exécution de la fonction main...\n%!";
       
       (* Préparation des arguments argc et argv *)
       let argc = Array.length Sys.argv in
@@ -92,13 +100,13 @@ let main () =
       
       (* Exécution de la fonction main *)
       let result = Sem.eval_expr env fun_tbl (Ast.App ("main", [Ast.Ident "_argc_main"; Ast.Ident "_argv_main"])) in
-      Printf.printf "✅ Fonction main terminée avec succès.\n";
+      debug_printf "✅ Fonction main terminée avec succès.\n";
       (match result with
        | Sem.Vint exit_code -> 
-           Printf.printf "Code de sortie: %d\n" exit_code;
+           debug_printf "Code de sortie: %d\n" exit_code;
            if exit_code <> 0 then exit exit_code
        | Sem.Vtemplate template_result ->
-           Printf.printf "=== RÉSULTAT TEMPLATE ===\n";
+           debug_printf "=== RÉSULTAT TEMPLATE ===\n";
            (* Vérification du deuxième argument pour l'écriture dans un fichier *)
            (if Array.length Sys.argv >= 3 then
               let output_file = Array.get Sys.argv 2 in
@@ -108,21 +116,20 @@ let main () =
                 close_out oc;
                 Printf.printf "📄 Template écrit dans le fichier: %s\n" output_file
               with Sys_error msg ->
-                Printf.eprintf "❌ Erreur lors de l'écriture du fichier '%s': %s\n" output_file msg;
-                Printf.printf "Affichage sur stdout à la place:\n%s\n" template_result
+                raise (Exception_content.File_error (Exception_content.make_file_error output_file "écriture" msg))
            else
               Printf.printf "%s\n" template_result)
-       | _ -> Printf.printf "Résultat: (autre type)\n")
+       | _ -> debug_printf "Résultat: (autre type)\n")
     with 
-    | Not_found -> Printf.printf "⚠️  Aucune fonction 'main' trouvée - pas d'exécution.\n%!"
+    | Not_found -> debug_printf "⚠️  Aucune fonction 'main' trouvée - pas d'exécution.\n%!"
     | Sem.Return_exception result -> 
-        Printf.printf "✅ Fonction main terminée avec return.\n";
+        debug_printf "✅ Fonction main terminée avec return.\n";
         (match result with
          | Sem.Vint exit_code -> 
-             Printf.printf "Code de sortie: %d\n" exit_code;
+             debug_printf "Code de sortie: %d\n" exit_code;
              if exit_code <> 0 then exit exit_code
          | Sem.Vtemplate template_result ->
-             Printf.printf "=== RÉSULTAT TEMPLATE ===\n";
+             debug_printf "=== RÉSULTAT TEMPLATE ===\n";
              (* Vérification du deuxième argument pour l'écriture dans un fichier *)
              (if Array.length Sys.argv >= 3 then
                 let output_file = Array.get Sys.argv 2 in
@@ -132,11 +139,10 @@ let main () =
                   close_out oc;
                   Printf.printf "📄 Template écrit dans le fichier: %s\n" output_file
                 with Sys_error msg ->
-                  Printf.eprintf "❌ Erreur lors de l'écriture du fichier '%s': %s\n" output_file msg;
-                  Printf.printf "Affichage sur stdout à la place:\n%s\n" template_result
+                  raise (Exception_content.File_error (Exception_content.make_file_error output_file "écriture" msg))
              else
                 Printf.printf "%s\n" template_result)
-         | _ -> Printf.printf "Résultat: (autre type)\n")
+         | _ -> debug_printf "Résultat: (autre type)\n")
     | Failure msg -> 
         Printf.eprintf "❌ Erreur d'exécution: %s\n%!" msg;
         exit 3
@@ -144,27 +150,52 @@ let main () =
         Printf.eprintf "❌ Break en dehors d'une boucle\n%!";
         exit 3);
 
-    Printf.printf "\n🏁 Analyse terminée.\n%!";
+    debug_printf "\n🏁 Analyse terminée.\n%!";
     if input_channel <> stdin then close_in input_channel;
     exit 0
   with
   | Lexer.LexError (start_pos, end_pos) ->
-      Printf.eprintf "\n❌ Erreur lexicale: entre les caractères %d et %d (ligne %d)
-%!"
+      Printf.eprintf "\n❌ Erreur lexicale: entre les caractères %d et %d (ligne %d)\n%!"
         start_pos.Lexing.pos_cnum end_pos.Lexing.pos_cnum start_pos.Lexing.pos_lnum;
       if input_channel <> stdin then close_in input_channel;
       exit 1
   | Parsing.Parse_error ->
       let pos = Lexing.lexeme_start_p lexbuf in
-      Printf.eprintf "\n❌ Erreur de syntaxe: à la ligne %d, caractère %d
-%!"
+      Printf.eprintf "\n❌ Erreur de syntaxe: à la ligne %d, caractère %d\n%!"
         pos.Lexing.pos_lnum
         (pos.Lexing.pos_cnum - pos.Lexing.pos_bol);
       if input_channel <> stdin then close_in input_channel;
       exit 1
-  | Failure msg -> (* Pour d\'autres erreurs d\'exécution potentielles *)
-      Printf.eprintf "\n❌ Erreur inattendue: %s
-%!" msg;
+  | Exception_content.Undefined_variable err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_undefined_variable err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.Undefined_function err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_undefined_function err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.Operator_error err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_operator_error err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.Array_index_error err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_array_index_error err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.Type_error err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_type_error err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.Division_error err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_division_error err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.Template_error err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_template_error err;
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Exception_content.File_error err ->
+      Printf.eprintf "\n❌ %a\n%!" Exception_content.print_file_error err;
       if input_channel <> stdin then close_in input_channel;
       exit 2
   | Exception_content.Duplicate_name dup_name ->
@@ -183,6 +214,10 @@ let main () =
       Printf.eprintf "\n❌ Break en dehors d'une boucle\n%!";
       if input_channel <> stdin then close_in input_channel;
       exit 3
+  | Failure msg -> (* Pour d'autres erreurs d'exécution potentielles *)
+      Printf.eprintf "\n❌ Erreur inattendue: %s\n%!" msg;
+      if input_channel <> stdin then close_in input_channel;
+      exit 2
 
 let () =
   if !Sys.interactive then () else main ()

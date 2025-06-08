@@ -12,11 +12,13 @@
 %token <string> TEMPLATE_STRING
 
 // opérateurs arithmétiques
-%token EQUALEQUAL COLONEQUAL PLUS MINUS MULT DIV GREATER SMALLER GREATEREQUAL SMALLEREQUAL
+%token EQUALEQUAL COLONEQUAL PLUS MINUS MULT DIV MOD GREATER SMALLER GREATEREQUAL SMALLEREQUAL NOT NOTEQUAL AND OR
 
-%left EQUALEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
+%left EQUALEQUAL NOTEQUAL GREATER SMALLER GREATEREQUAL SMALLEREQUAL
+%left OR
+%left AND
 %left PLUS MINUS
-%left MULT DIV
+%left MULT DIV MOD
 
 // structure
 %token LPAREN RPAREN COMMA
@@ -154,17 +156,22 @@ opt_else:
 // Expressions
 expr:
 | expr EQUALEQUAL expr           { Binop ("==", $1, $3) }
+| expr NOTEQUAL expr             { Binop ("!=", $1, $3) }
 | expr GREATER expr              { Binop (">", $1, $3) }
 | expr GREATEREQUAL expr         { Binop (">=", $1, $3) }
 | expr SMALLER expr              { Binop ("<", $1, $3) }
 | expr SMALLEREQUAL expr         { Binop ("<=", $1, $3) }
+| expr AND expr                  { Binop ("&&", $1, $3) }
+| expr OR expr                   { Binop ("||", $1, $3) }
 | expr PLUS expr                 { Binop ("+", $1, $3) }
 | expr MINUS expr                { Binop ("-", $1, $3) }
 | expr MULT expr                 { Binop ("*", $1, $3) }
 | expr DIV expr                  { Binop ("/", $1, $3) }
+| expr MOD expr                  { Binop ("%", $1, $3) }
 | expr DOUBLEDOT expr            { Range ($1, Some $3) }
 | expr DOUBLEDOT                 { Range ($1, None) }
 | MINUS expr                     { Monop ("-", $2) }
+| NOT expr                       { Monop ("!", $2) }
 | LPAREN expr RPAREN             { $2 }
 | atom                           { $1 }
 | IDENT LPAREN opt_exprs RPAREN  { App ($1, $3) }

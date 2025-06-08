@@ -1,0 +1,4 @@
+fn main(argc, argv) {
+    let x = 42;
+    print(x[0]);
+} 

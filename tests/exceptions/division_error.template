@@ -1,0 +1,4 @@
+fn main(argc, argv) {
+    let x = 5 / 0;
+    print(x);
+} 

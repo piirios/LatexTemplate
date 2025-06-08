@@ -1,0 +1,29 @@
+fn main(argc, argv) {
+    let a = 10;
+    let b = 3;
+    let x = true;
+    let y = false;
+    
+    // Tests arithmétiques
+    print("10 + 3 ="); print(a + b);
+    print("10 - 3 ="); print(a - b);
+    print("10 * 3 ="); print(a * b);
+    print("10 / 3 ="); print(a / b);
+    print("10 % 3 ="); print(a % b);
+    
+    // Tests de comparaison
+    print("10 == 3 ="); print(a == b);
+    print("10 != 3 ="); print(a != b);
+    print("10 > 3 ="); print(a > b);
+    print("10 >= 3 ="); print(a >= b);
+    print("10 < 3 ="); print(a < b);
+    print("10 <= 3 ="); print(a <= b);
+    
+    // Tests logiques
+    print("true && false ="); print(x && y);
+    print("true || false ="); print(x || y);
+    
+    // Tests unaires
+    print("-10 ="); print(-a);
+    print("!true ="); print(!x);
+} 

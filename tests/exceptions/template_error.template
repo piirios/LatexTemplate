@@ -1,0 +1,10 @@
+fn bad_template_function(arg) {
+    return 42;  // Retourne un int au lieu d'un template
+}
+
+fn main(argc, argv) {
+    return <% template %>
+        Hello World!
+        <% use bad_template_function("test") %>
+    <% endtemplate %>;
+} 

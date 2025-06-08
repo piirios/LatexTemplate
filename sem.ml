@@ -40,8 +40,8 @@ let produce_template_val = function
 | Vbool b -> Tbool b
 | Vstring s -> Tstring s
 | Vunit -> Tunit
-| Varray _ -> raise (Failure "Varray should not be used in a template")
-| Vrange _ -> raise (Failure "Vrange should not be used in a template")
+| Varray _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "type simple" "array" "conversion vers template"))
+| Vrange _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "type simple" "range" "conversion vers template"))
 | Vtemplate tpl -> Tstring tpl
 
 (* Fonction next pour les itérateurs *)
@@ -61,16 +61,29 @@ let next = function
 | Varray [] ->
     (* Tableau vide *)
     (None, Varray [])
-| _ -> failwith "next: argument doit être un Vrange ou un Varray"
+| _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "Vrange ou Varray" "autre type" "fonction next pour itération"))
 
 (* Fonctions d'évaluation des opérateurs *)
 let eval_binop op v1 v2 = 
+  let get_type_name = function
+    | Vint _ -> "int"
+    | Vbool _ -> "bool" 
+    | Vstring _ -> "string"
+    | Varray _ -> "array"
+    | Vrange _ -> "range"
+    | Vtemplate _ -> "template"
+    | Vunit -> "unit"
+  in
   match op, v1, v2 with
   | "+", Vint i1, Vint i2 -> Vint (i1 + i2)
   | "-", Vint i1, Vint i2 -> Vint (i1 - i2)
   | "*", Vint i1, Vint i2 -> Vint (i1 * i2)
-  | "/", Vint i1, Vint i2 -> if i2 = 0 then failwith "Division par zéro" else Vint (i1 / i2)
-  | "%", Vint i1, Vint i2 -> if i2 = 0 then failwith "Modulo par zéro" else Vint (i1 mod i2)
+  | "/", Vint i1, Vint i2 -> 
+      if i2 = 0 then raise (Exception_content.Division_error (Exception_content.make_division_error "/" "opération binaire"))
+      else Vint (i1 / i2)
+  | "%", Vint i1, Vint i2 -> 
+      if i2 = 0 then raise (Exception_content.Division_error (Exception_content.make_division_error "%" "opération binaire"))
+      else Vint (i1 mod i2)
   | "==", v1, v2 -> Vbool (v1 = v2)
   | "!=", v1, v2 -> Vbool (v1 <> v2)
   | "<", Vint i1, Vint i2 -> Vbool (i1 < i2)
@@ -80,13 +93,22 @@ let eval_binop op v1 v2 =
   | "&&", Vbool b1, Vbool b2 -> Vbool (b1 && b2)
   | "||", Vbool b1, Vbool b2 -> Vbool (b1 || b2)
   | "+", Vstring s1, Vstring s2 -> Vstring (s1 ^ s2)
-  | _ -> failwith ("Opérateur binaire non supporté: " ^ op)
+  | _ -> raise (Exception_content.Operator_error (Exception_content.make_operator_error op (get_type_name v1) (Some (get_type_name v2)) "évaluation d'expression binaire"))
 
 let eval_monop op v = 
+  let get_type_name = function
+    | Vint _ -> "int"
+    | Vbool _ -> "bool" 
+    | Vstring _ -> "string"
+    | Varray _ -> "array"
+    | Vrange _ -> "range"
+    | Vtemplate _ -> "template"
+    | Vunit -> "unit"
+  in
   match op, v with
   | "-", Vint i -> Vint (-i)
   | "!", Vbool b -> Vbool (not b)
-  | _ -> failwith ("Opérateur unaire non supporté: " ^ op)
+  | _ -> raise (Exception_content.Operator_error (Exception_content.make_operator_error op (get_type_name v) None "évaluation d'expression unaire"))
 
 let rec eval_expr env fun_tbl expr = 
   match expr with
@@ -96,16 +118,18 @@ let rec eval_expr env fun_tbl expr =
   | Ast.Unit -> Vunit
   | Ast.Ident var -> 
       (try get_from_env env var
-       with Not_found -> failwith ("Variable non définie: " ^ var))
+       with Not_found -> raise (Exception_content.Undefined_variable (Exception_content.make_undefined_variable var "évaluation d'expression")))
   | Ast.ArrayRead (arr_name, idx_expr) ->
-      let arr_val = get_from_env env arr_name in
+      let arr_val = (try get_from_env env arr_name 
+                     with Not_found -> raise (Exception_content.Undefined_variable (Exception_content.make_undefined_variable arr_name "lecture de tableau"))) in
       let idx_val = eval_expr env fun_tbl idx_expr in
       (match arr_val, idx_val with
        | Varray arr, Vint i -> 
            if i >= 0 && i < List.length arr then
              List.nth arr i
-           else failwith "Index de tableau hors limites"
-       | _ -> failwith "Lecture de tableau invalide")
+           else raise (Exception_content.Array_index_error (Exception_content.make_array_index_error arr_name i (List.length arr) "lecture de tableau"))
+       | _, Vint _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "array" "autre type" ("lecture de " ^ arr_name)))
+       | _, _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "int" "autre type" ("index de " ^ arr_name))))
   | Ast.App (fname, args) ->
       let arg_vals = List.map (eval_expr env fun_tbl) args in
       (try 
@@ -116,7 +140,9 @@ let rec eval_expr env fun_tbl expr =
            List.iter (eval_instr new_env fun_tbl) func_def.Ast.body;
            Vunit (* Si aucun return explicite *)
          with Return_exception result -> result
-       with Not_found -> failwith ("Fonction non définie: " ^ fname))
+       with Not_found -> 
+         let available_funcs = Hashtbl.fold (fun k _ acc -> k :: acc) fun_tbl [] in
+         raise (Exception_content.Undefined_function (Exception_content.make_undefined_function fname available_funcs)))
   | Ast.Binop (op, e1, e2) ->
       let v1 = eval_expr env fun_tbl e1 in
       let v2 = eval_expr env fun_tbl e2 in
@@ -132,7 +158,8 @@ let rec eval_expr env fun_tbl expr =
       (match start_val, end_val_opt with
        | Vint start, None -> Vrange (start, None)
        | Vint start, Some (Vint end_val) -> Vrange (start, Some end_val)
-       | _ -> failwith "Range invalide")
+       | Vint _, Some _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "int" "autre type" "borne de fin de range"))
+       | _, _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "int" "autre type" "borne de début de range")))
   | Ast.Template tpl_list ->
       let tpl_content = eval_template_val env fun_tbl tpl_list in
       Vtemplate tpl_content
@@ -168,7 +195,7 @@ and eval_template_val env fun_tbl tpl_list =
                  while_loop (acc ^ body_result)
                with Break_exception -> acc)
           | Vbool false -> acc
-          | _ -> failwith "Condition de while doit être booléenne" in
+          | _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "bool" "autre type" "condition while dans template")) in
         while_loop ""
     | Ast.Loop body ->
         let rec infinite_loop acc =
@@ -182,13 +209,13 @@ and eval_template_val env fun_tbl tpl_list =
         (match cond_val with
          | Vbool true -> eval_template_val env fun_tbl then_body
          | Vbool false -> eval_template_val env fun_tbl else_body
-         | _ -> failwith "Condition de if doit être booléenne")
+         | _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "bool" "autre type" "condition if dans template")))
     | Ast.Import (fname, args) ->
         (* Appel de fonction pour les imports *)
         let result = eval_expr env fun_tbl (Ast.App (fname, args)) in
         (match result with
          | Vtemplate template_content -> template_content
-         | _ -> failwith ("La fonction '" ^ fname ^ "' doit retourner un template"))
+         | _ -> raise (Exception_content.Template_error (Exception_content.make_template_error fname "doit retourner un template" "import dans template")))
     | Ast.Break -> raise Break_exception
   in
   String.concat "" (List.map eval_single_template tpl_list)
@@ -206,7 +233,7 @@ and eval_instr env fun_tbl instr =
                while_loop ()
              with Break_exception -> ())
         | Vbool false -> ()
-        | _ -> failwith "Condition de while doit être booléenne" in
+        | _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "bool" "autre type" "condition while")) in
       while_loop ()
   | Ast.For (var, range_expr, body) ->
       let iterable_val = eval_expr env fun_tbl range_expr in
@@ -234,7 +261,7 @@ and eval_instr env fun_tbl instr =
       (match cond_val with
        | Vbool true -> List.iter (eval_instr env fun_tbl) then_body
        | Vbool false -> List.iter (eval_instr env fun_tbl) else_body
-       | _ -> failwith "Condition de if doit être booléenne")
+       | _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "bool" "autre type" "condition if")))
   | Ast.Assign (var, expr) ->
       let val_result = eval_expr env fun_tbl expr in
       Hashtbl.replace env var val_result
@@ -249,7 +276,8 @@ and eval_instr env fun_tbl instr =
   | Ast.ArrayWrite (arr_name, idx_expr, val_expr) ->
       let idx_val = eval_expr env fun_tbl idx_expr in
       let new_val = eval_expr env fun_tbl val_expr in
-      let arr_val = get_from_env env arr_name in
+      let arr_val = (try get_from_env env arr_name 
+                     with Not_found -> raise (Exception_content.Undefined_variable (Exception_content.make_undefined_variable arr_name "écriture de tableau"))) in
       (match arr_val, idx_val with
        | Varray arr, Vint i -> 
            if i >= 0 && i < List.length arr then
@@ -257,8 +285,9 @@ and eval_instr env fun_tbl instr =
                if j = i then new_val else code_val
              ) arr in
              Hashtbl.replace env arr_name (Varray new_arr)
-           else failwith "Index de tableau hors limites"
-       | _ -> failwith "Écriture de tableau invalide")
+           else raise (Exception_content.Array_index_error (Exception_content.make_array_index_error arr_name i (List.length arr) "écriture de tableau"))
+       | _, Vint _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "array" "autre type" ("écriture dans " ^ arr_name)))
+       | _, _ -> raise (Exception_content.Type_error (Exception_content.make_type_error "int" "autre type" ("index pour écriture dans " ^ arr_name))))
   | Ast.Return expr ->
       let val_result = eval_expr env fun_tbl expr in
       raise (Return_exception val_result)

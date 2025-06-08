@@ -1,0 +1,4 @@
+fn main(argc, argv) {
+    let x = "hello"..5;
+    print(x);
+} 

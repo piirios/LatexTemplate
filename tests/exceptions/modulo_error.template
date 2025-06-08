@@ -1,0 +1,4 @@
+fn main(argc, argv) {
+    let x = 15 % 0;
+    print(x);
+} 

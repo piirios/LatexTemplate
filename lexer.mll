@@ -146,10 +146,13 @@ rule lex = parse
   | "=="   { EQUALEQUAL }
   | ">"   { GREATER} | "<"  { SMALLER }
   | ">="  { GREATEREQUAL} | "<="  { SMALLEREQUAL }
-  | "+"   { PLUS } | "-"   { MINUS } | "*" { MULT } | "/" { DIV }
+  | "+"   { PLUS } | "-"   { MINUS } | "*" { MULT } | "/" { DIV } | "%" { MOD } | "!" { NOT }
   | ";"   { SEMICOLON }
   | ","   { COMMA }
   | ".."  { DOUBLEDOT }
+  | "!="  { NOTEQUAL }
+  | "&&"  { AND }
+  | "||"  { OR }
   | "()"   { UNIT }
   | '('   { LPAREN }
   | ')'   { RPAREN }

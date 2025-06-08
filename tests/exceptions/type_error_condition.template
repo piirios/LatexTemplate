@@ -1,0 +1,5 @@
+fn main(argc, argv) {
+    if "hello" {
+        print("This shouldn't work");
+    }
+} 

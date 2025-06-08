@@ -1,0 +1,5 @@
+fn main(argc, argv) {
+    let mut arr = [1, 2, 3];
+    arr[5] = 100;
+    print(arr);
+} 

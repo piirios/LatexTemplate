@@ -1,0 +1,7 @@
+fn main(argc, argv) {
+    let x = 15;
+    let y = 4;
+    let reste = x % y;
+    print("15 % 4 =");
+    print(reste);
+} 

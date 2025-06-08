@@ -1,0 +1,3 @@
+fn main(argc, argv) {
+    print("Test simple pour déclencher File_error lors de l'écriture");
+} 

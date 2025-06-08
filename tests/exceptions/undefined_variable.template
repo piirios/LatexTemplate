@@ -1,0 +1,4 @@
+fn main(argc, argv) {
+    let x = undefined_var;
+    print(x);
+} 
