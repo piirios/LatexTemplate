@@ -6,9 +6,15 @@ fn special_print(wow) {
     print("EOF special print\n");
 }
 
-fn Composant(arg1, arg2, arg3) {
+fn main(argc, argv) {
+    let params1 = 0;
+    let params2 = 3;
     let mut val1 = params1;
     let val2 = params1 + params2;
+    let x = 1;
+    let arg1 = "Premier argument";
+    let arg2 = "Deuxième argument";
+    let arg3 = "Troisième argument";
     val1 = 1;
     for i in 1..25 {
         print(i);
@@ -29,9 +35,7 @@ fn Composant(arg1, arg2, arg3) {
         <% loop %>
             mljmioihiuhih
             
-            <% if x + 3 == 4 %>
-                <% break %>
-            <% endif %>
+            <% break %>
         <% endloop %>
 
         <% use Composant2(arg1, arg2, arg3) %>

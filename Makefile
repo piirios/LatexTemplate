@@ -15,7 +15,7 @@ CORE_SOURCES = $(filter-out $(GENERATED), $(wildcard *.ml))
 
 MLIS =
 # Ordre correct des objets selon les dépendances
-OBJS = ast.cmo exception_content.cmo namespace.cmo subst.cmo mem.cmo parser.cmo lexer.cmo import.cmo main.cmo
+OBJS = ast.cmo exception_content.cmo namespace.cmo subst.cmo mem.cmo sem.cmo parser.cmo lexer.cmo import.cmo main.cmo
 
 # Building the world
 all: $(EXEC)

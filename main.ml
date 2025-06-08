@@ -2,8 +2,9 @@ let version = "0.01" (* Ou la version actuelle de votre projet *)
 
 let usage () =
   Printf.eprintf
-    "Usage: %s [fichier.template]
+    "Usage: %s [fichier.template] [fichier_sortie.tex]
 \tAnalyse un fichier LatexTemplate (entrée standard par défaut)
+\tSi fichier_sortie.tex est spécifié, le template sera écrit dans ce fichier
 %!"
     Sys.argv.(0);
   exit 1
@@ -12,7 +13,7 @@ let main () =
   let input_channel =
     match Array.length Sys.argv with
     | 1 -> stdin
-    | 2 ->
+    | 2 | 3 ->
         (match Sys.argv.(1) with
         | "-" -> stdin
         | name ->
@@ -49,16 +50,101 @@ let main () =
     Printf.printf "✅ %d fonctions et %d variables trouvées\n%!" fun_count var_count;
     Printf.printf "=== STRUCTURE AST (MODE DEBUG) ===
 ";
-    List.iter
-      (fun item ->
-        Ast.print_dbg_top_level stdout item;
-        Printf.printf "
-----------------------------------------
-")
-      resolved_items;
-    Printf.printf "
-🏁 Analyse terminée.
-%!";
+    Printf.printf "=== CONTENU DE LA TABLE DES FONCTIONS ===\n";
+    Hashtbl.iter (fun name func_def ->
+      Printf.printf "Fonction '%s':\n" name;
+      List.iter (fun inst -> 
+        Ast.print_dbg_instr stdout inst;
+        Printf.printf "\n"
+      ) func_def.Ast.body;
+      Printf.printf "----------------------------------------\n"
+    ) fun_tbl;
+
+    Printf.printf "\n=== INSTRUCTIONS/EXPRESSIONS DE HAUT NIVEAU ===\n";
+    List.iter (fun item ->
+      match item with
+      | Ast.Instruction inst -> 
+          Printf.printf "Instruction: ";
+          Ast.print_dbg_instr stdout inst;
+          Printf.printf "\n"
+      | Ast.Expression expr ->
+          Printf.printf "Expression: ";
+          Ast.print_dbg_expr stdout expr;
+          Printf.printf "\n"
+      | _ -> ()
+    ) toplvl_inst_expr;
+
+    (* Exécution de la fonction main si elle existe *)
+    Printf.printf "\n=== EXÉCUTION ===\n";
+    (try 
+      let main_func = Hashtbl.find fun_tbl "main" in
+      Printf.printf "🚀 Exécution de la fonction main...\n%!";
+      
+      (* Préparation des arguments argc et argv *)
+      let argc = Array.length Sys.argv in
+      let argv_list = Array.to_list (Array.map (fun s -> Sem.Vstring s) Sys.argv) in
+      let argv_array = Sem.Varray argv_list in
+      
+      (* Création de l'environnement initial *)
+      let env = Sem.init_env () in
+      Sem.add_to_env env "_argc_main" (Sem.Vint argc);
+      Sem.add_to_env env "_argv_main" argv_array;
+      
+      (* Exécution de la fonction main *)
+      let result = Sem.eval_expr env fun_tbl (Ast.App ("main", [Ast.Ident "_argc_main"; Ast.Ident "_argv_main"])) in
+      Printf.printf "✅ Fonction main terminée avec succès.\n";
+      (match result with
+       | Sem.Vint exit_code -> 
+           Printf.printf "Code de sortie: %d\n" exit_code;
+           if exit_code <> 0 then exit exit_code
+       | Sem.Vtemplate template_result ->
+           Printf.printf "=== RÉSULTAT TEMPLATE ===\n";
+           (* Vérification du deuxième argument pour l'écriture dans un fichier *)
+           (if Array.length Sys.argv >= 3 then
+              let output_file = Array.get Sys.argv 2 in
+              try
+                let oc = open_out output_file in
+                output_string oc template_result;
+                close_out oc;
+                Printf.printf "📄 Template écrit dans le fichier: %s\n" output_file
+              with Sys_error msg ->
+                Printf.eprintf "❌ Erreur lors de l'écriture du fichier '%s': %s\n" output_file msg;
+                Printf.printf "Affichage sur stdout à la place:\n%s\n" template_result
+           else
+              Printf.printf "%s\n" template_result)
+       | _ -> Printf.printf "Résultat: (autre type)\n")
+    with 
+    | Not_found -> Printf.printf "⚠️  Aucune fonction 'main' trouvée - pas d'exécution.\n%!"
+    | Sem.Return_exception result -> 
+        Printf.printf "✅ Fonction main terminée avec return.\n";
+        (match result with
+         | Sem.Vint exit_code -> 
+             Printf.printf "Code de sortie: %d\n" exit_code;
+             if exit_code <> 0 then exit exit_code
+         | Sem.Vtemplate template_result ->
+             Printf.printf "=== RÉSULTAT TEMPLATE ===\n";
+             (* Vérification du deuxième argument pour l'écriture dans un fichier *)
+             (if Array.length Sys.argv >= 3 then
+                let output_file = Array.get Sys.argv 2 in
+                try
+                  let oc = open_out output_file in
+                  output_string oc template_result;
+                  close_out oc;
+                  Printf.printf "📄 Template écrit dans le fichier: %s\n" output_file
+                with Sys_error msg ->
+                  Printf.eprintf "❌ Erreur lors de l'écriture du fichier '%s': %s\n" output_file msg;
+                  Printf.printf "Affichage sur stdout à la place:\n%s\n" template_result
+             else
+                Printf.printf "%s\n" template_result)
+         | _ -> Printf.printf "Résultat: (autre type)\n")
+    | Failure msg -> 
+        Printf.eprintf "❌ Erreur d'exécution: %s\n%!" msg;
+        exit 3
+    | Sem.Break_exception ->
+        Printf.eprintf "❌ Break en dehors d'une boucle\n%!";
+        exit 3);
+
+    Printf.printf "\n🏁 Analyse terminée.\n%!";
     if input_channel <> stdin then close_in input_channel;
     exit 0
   with
@@ -89,6 +175,14 @@ let main () =
       Printf.eprintf "\n❌ %a\n%!" Exception_content.print_duplicate_name_import dup_name;
       if input_channel <> stdin then close_in input_channel;
       exit 1
+  | Sem.Return_exception _ ->
+      Printf.eprintf "\n❌ Return en dehors d'une fonction\n%!";
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
+  | Sem.Break_exception ->
+      Printf.eprintf "\n❌ Break en dehors d'une boucle\n%!";
+      if input_channel <> stdin then close_in input_channel;
+      exit 3
 
 let () =
   if !Sys.interactive then () else main ()

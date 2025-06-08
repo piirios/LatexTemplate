@@ -13,9 +13,11 @@ let load_function_into_table tbl tplvls =
             List.iteri (fun i param -> 
                 Hashtbl.add sub_tbl param (Ast.Ident("_" ^ param ^ "_" ^ func.f_name))
             ) func.params;
+            let renamed_params = List.map (fun param -> "_" ^ param ^ "_" ^ func.f_name) func.params in
             let renamed_func = {
-                func with
-                body = Subst.alpha_substitution sub_tbl func.body
+                Ast.f_name = func.Ast.f_name;
+                Ast.params = renamed_params;
+                Ast.body = Subst.alpha_substitution sub_tbl func.Ast.body
             } in
             Hashtbl.add tbl func.f_name renamed_func;
             load_function_into_table_rec acc tl
