@@ -1,0 +1,42 @@
+use tests/facture/HeaderComponent;
+use tests/facture/InvoiceInfoComponent;
+use tests/facture/FooterComponent;
+
+fn main(argc, argv) {
+    let companyname = "TechConseil";
+    let companyaddress = "123 Rue Tech";
+    let companycity = "Paris";
+    let companystate = "France";
+    let companyzip = "75001";
+    let companyemail = "tech@company.fr";
+    let companyphone = "01-23-45-67-89";
+    let companylogo = "logo.png";
+    let companyfooter = "Merci !";
+    
+    let invoiceto = "Client ABC";
+    let invoiceid = "001";
+    let invoicedate = "15/12/2024";
+    
+    let grand_total = 5000;
+    
+    return <% template %>
+\documentclass[12pt]{article}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{array}
+
+\begin{document}
+
+<% use CompanyHeader(companyname, companyaddress, companycity, companystate, companyzip, companyemail, companyphone, companylogo) %>
+
+<% use InvoiceInfo(invoiceto, invoiceid, invoicedate) %>
+
+\noindent\textbf{Services:}\\
+Development work: $3000\\
+Consulting: $2000\\
+
+<% use InvoiceFooter(grand_total, companyname, companyfooter) %>
+
+\end{document}
+<% endtemplate %>;
+} 

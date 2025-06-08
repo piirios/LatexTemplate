@@ -1,0 +1,10 @@
+fn InvoiceFooter(grand_total, companyname, companyfooter) {
+    return <% template %>
+\noindent{\textbf{Grand Total:}} \$<% grand_total %>
+
+% Pied de page
+\begin{center}
+    {\textit{<% companyname %> — <% companyfooter %>}}
+\end{center}
+<% endtemplate %>;
+} 

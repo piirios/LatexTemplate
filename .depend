@@ -17,6 +17,7 @@ lexer.cmo : \
 lexer.cmx : \
     parser.cmx
 main.cmo : \
+    sem.cmo \
     parser.cmi \
     namespace.cmo \
     mem.cmo \
@@ -25,6 +26,7 @@ main.cmo : \
     exception_content.cmo \
     ast.cmo
 main.cmx : \
+    sem.cmx \
     parser.cmx \
     namespace.cmx \
     mem.cmx \
@@ -52,8 +54,12 @@ parser.cmx : \
     parser.cmi
 parser.cmi : \
     ast.cmo
-sem.cmo :
-sem.cmx :
+sem.cmo : \
+    exception_content.cmo \
+    ast.cmo
+sem.cmx : \
+    exception_content.cmx \
+    ast.cmx
 subst.cmo : \
     ast.cmo
 subst.cmx : \

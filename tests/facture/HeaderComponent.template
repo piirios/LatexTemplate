@@ -1,0 +1,16 @@
+fn CompanyHeader(companyname, companyaddress, companycity, companystate, companyzip, companyemail, companyphone, companylogo) {
+    return <% template %>
+% Logo et en-tête
+\begin{center}
+    \includegraphics[width=2.5cm]{<% companylogo %>}
+    
+    {\Large\bfseries <% companyname %>}\\
+    {<% companyaddress %>, <% companycity %>, <% companystate %>, <% companyzip %>}\\
+    Email: <% companyemail %> \hspace{1cm} Phone: <% companyphone %>
+\end{center}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+<% endtemplate %>;
+} 

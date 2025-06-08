@@ -167,19 +167,22 @@ rule lex = parse
   | "//"  { in_cpp_comment lexbuf }
   | "/*"  { in_c_comment lexbuf }
   | eof   { EOF }
-  | _ as c { raise (LexError (Lexing.lexeme_start_p lexbuf, Lexing.lexeme_end_p lexbuf)) }
+  | _     { lex lexbuf } (* Ignore tous les autres caractères au lieu de lever une erreur *)
 
 and in_template_string = parse
     newline opening_tag | opening_tag
       { () }
   | newline as s
-      { for i = 0 to String.length s - 1 do
+      { incr_line_number lexbuf;
+        for i = 0 to String.length s - 1 do
           store_template_string_char s.[i];
         done;
         in_template_string lexbuf
       }
   | eof
       { raise Eoi }
+  | ['\128'-'\255'] as c
+      { store_template_string_char c; in_template_string lexbuf }
   | _ as c
       { store_template_string_char c; in_template_string lexbuf }
 
@@ -205,6 +208,8 @@ and in_string = parse
       }
   | eof
       { raise Eoi }
+  | ['\128'-'\255'] as c
+      { store_string_char c; in_string lexbuf }
   | _ as c
       { store_string_char c; in_string lexbuf }
 

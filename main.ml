@@ -60,26 +60,26 @@ let main () =
     if debug_mode then (
       Hashtbl.iter (fun name func_def ->
         debug_printf "Fonction '%s':\n" name;
-        List.iter (fun inst -> 
+      List.iter (fun inst -> 
           Ast.print_dbg_instr stdout inst;
           debug_printf "\n"
         ) func_def.Ast.body;
         debug_printf "----------------------------------------\n"
-      ) fun_tbl;
+    ) fun_tbl;
 
       debug_printf "\n=== INSTRUCTIONS/EXPRESSIONS DE HAUT NIVEAU ===\n";
-      List.iter (fun item ->
-        match item with
-        | Ast.Instruction inst -> 
+    List.iter (fun item ->
+      match item with
+      | Ast.Instruction inst -> 
             debug_printf "Instruction: ";
             Ast.print_dbg_instr stdout inst;
             debug_printf "\n"
-        | Ast.Expression expr ->
+      | Ast.Expression expr ->
             debug_printf "Expression: ";
-            Ast.print_dbg_expr stdout expr;
+          Ast.print_dbg_expr stdout expr;
             debug_printf "\n"
-        | _ -> ()
-      ) toplvl_inst_expr;
+      | _ -> ()
+    ) toplvl_inst_expr;
     );
 
     (* Exécution de la fonction main si elle existe *)

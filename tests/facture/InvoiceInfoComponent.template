@@ -1,0 +1,9 @@
+fn InvoiceInfo(invoiceto, invoiceid, invoicedate) {
+    return <% template %>
+% Informations de facture
+\noindent{\textbf{Invoice To:}} <% invoiceto %>\\
+\noindent{\textbf{Invoice Number:}} \#<% invoiceid %>\\
+{\textbf{Invoice Date:}} <% invoicedate %>\\
+
+<% endtemplate %>;
+} 

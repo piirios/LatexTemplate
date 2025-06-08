@@ -142,8 +142,8 @@ template_element:
     { Import ($2, $4) }
 | BREAK 
     { Break }
-| VAR_START expr VAR_END 
-    { Expression $2 }
+| expr 
+    { Expression $1 }
 | IDENT 
     { Expression (Ident $1) }
 ;
